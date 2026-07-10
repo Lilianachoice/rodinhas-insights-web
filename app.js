@@ -50,3 +50,34 @@ function atualizarDashboard(pedidos) {
 }
 
 carregarPedidos();
+
+
+// ---------------------------
+// Atualização dos sliders
+// ---------------------------
+
+function ligarSlider(idSlider, idTexto, sufixo){
+
+    const slider = document.getElementById(idSlider);
+    const texto = document.getElementById(idTexto);
+
+    if(!slider || !texto)
+        return;
+
+    function atualizar(){
+
+        texto.innerText = slider.value + sufixo;
+
+    }
+
+    atualizar();
+
+    slider.addEventListener("input", atualizar);
+
+}
+
+ligarSlider("capacidade","valorCapacidade"," lugares");
+ligarSlider("tempoViatura","valorTempo"," minutos");
+ligarSlider("pickupKm","valorPickup"," km");
+ligarSlider("dropoffKm","valorDropoff"," km");
+ligarSlider("valorMinimo","valorMensal"," €");
