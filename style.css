@@ -45,11 +45,17 @@ header{
 }
 
 main{
-    display:grid;
-    grid-template-columns:300px 1fr 320px;
-    gap:25px;
-    padding:30px;
-    height:650px;
+
+display:grid;
+
+grid-template-columns:300px 1fr 320px;
+
+gap:25px;
+
+padding:30px;
+
+align-items:start;
+
 }
 
 .sidebar,
