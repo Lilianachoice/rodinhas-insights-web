@@ -55,52 +55,29 @@ function desenharPedidos() {
         : "#333333";
 
     L.circleMarker(
-
-      [
+    [
         Number(p["Pickup Lat"]),
         Number(p["Pickup Lng"])
-      ],
-
-      {
+    ],
+    {
         radius: 7,
         color: cor,
         fillColor: cor,
         fillOpacity: 0.9
-      }
+    }
+)
+.bindPopup(
+`
+<b>${p["Pickup Cidade"] || "Sem cidade"}</b><br>
 
-    )
-.bindPopup(`
+💶 ${(Number(p["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €<br>
 
-<b>Pedido #${p["ID"]}</b>
-
-<hr>
-
-<b>📍 Pickup</b><br>
-${p["Pickup"]}<br>
-${p["Pickup Cidade"]}
-
-<br><br>
-
-<b>🏁 Dropoff</b><br>
-${p["Dropoff"]}<br>
-${p["Dropoff Cidade"]}
-
-<br><br>
-
-💰 <b>${Number(p["Monthly Fee"] || 0).toLocaleString("pt-PT")} € / mês</b>
-
-<br>
-
-👥 ${p["Transport Type"]}
-
-<br>
+👥 ${p["Transport Type"]}<br>
 
 📅 ${p["Dias"]}
-
-`);
-
-
-      .addTo(marcadores);
+`
+)
+.addTo(marcadores);
 
   });
 
