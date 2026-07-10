@@ -8,6 +8,7 @@ const API_URL =
 
 let mapa;
 let marcadores;
+let pedidos = [];
 
 // Última atualização
 document.getElementById("ultimaAtualizacao").innerHTML =
@@ -19,17 +20,64 @@ document.getElementById("ultimaAtualizacao").innerHTML =
 
 function iniciarMapa() {
 
-    mapa = L.map("map").setView([39.6, -8.0], 7);
+  mapa = L.map("map").setView([39.6, -8.0], 7);
 
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            maxZoom: 19,
-            attribution: "© OpenStreetMap"
-        }
-    ).addTo(mapa);
+  L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap"
+    }
+  ).addTo(mapa);
 
-    marcadores = L.layerGroup().addTo(mapa);
+  marcadores = L.layerGroup().addTo(mapa);
+
+}
+
+// ==========================================
+// Desenhar pedidos
+// ==========================================
+
+function desenharPedidos() {
+
+  marcadores.clearLayers();
+
+  pedidos.forEach(p => {
+
+    if (!p["Pickup Lat"])
+      return;
+
+    const cor =
+      p["Transport Type"] === "Shared"
+        ? "#F4C400"
+        : "#333333";
+
+    L.circleMarker(
+
+      [
+        Number(p["Pickup Lat"]),
+        Number(p["Pickup Lng"])
+      ],
+
+      {
+        radius: 7,
+        color: cor,
+        fillColor: cor,
+        fillOpacity: 0.9
+      }
+
+    )
+      .bindPopup(
+
+        `<b>${p["Pickup Cidade"] || "Sem cidade"}</b><br>
+         ${p["Transport Type"]}<br>
+         ${(Number(p["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €`
+
+      )
+
+      .addTo(marcadores);
+
+  });
 
 }
 
@@ -48,6 +96,8 @@ async function carregarPedidos() {
     console.log("Pedidos carregados:", pedidos.length);
 
     atualizarDashboard();
+
+    desenharPedidos();
 
   } catch (erro) {
 
@@ -112,5 +162,7 @@ ligarSlider("dropoffKm", "valorDropoff", " km");
 ligarSlider("valorMinimo", "valorMensal", " €");
 
 // ==========================================
+
+iniciarMapa();
 
 carregarPedidos();
