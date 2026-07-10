@@ -1,118 +1,60 @@
-<!DOCTYPE html>
-<html lang="pt">
+// ==========================================
+// Rodinhas Insights
+// ==========================================
 
-<head>
+// URL da tua API Apps Script
+const API_URL = "COLOCA_AQUI_O_TEU_URL";
 
-<meta charset="UTF-8">
+// Última atualização
+document.getElementById("ultimaAtualizacao").innerHTML =
+    new Date().toLocaleString("pt-PT");
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+// ----------------------------
 
-<title>Rodinhas Insights</title>
+async function carregarPedidos() {
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    try {
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        const response = await fetch(API_URL);
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        const pedidos = await response.json();
 
-<link rel="stylesheet" href="style.css">
+        console.log("Pedidos:", pedidos);
 
-</head>
+        atualizarDashboard(pedidos);
 
-<body>
+    }
 
-<header>
+    catch (erro) {
 
-<div class="logo">
+        console.error("Erro:", erro);
 
-<img src="assets/logo.png">
+    }
 
-<div>
+}
 
-<h1>Rodinhas Insights</h1>
+// ----------------------------
 
-<p>Business Intelligence para expansão de rotas</p>
+function atualizarDashboard(pedidos) {
 
-</div>
+    // Nº de pedidos
+    document.getElementById("pedidos").innerText = pedidos.length;
 
-</div>
+    // Receita potencial
+    let receita = 0;
 
-<div class="last-update">
+    pedidos.forEach(p => {
 
-Última atualização
+        receita += Number(p["Monthly Fee"]) || 0;
 
-<br>
+    });
 
-<span id="ultimaAtualizacao">--</span>
+    document.getElementById("receita").innerText =
+        receita.toLocaleString("pt-PT") + " €";
 
-</div>
+    // Ainda vamos calcular automaticamente
+    document.getElementById("oportunidades").innerText = "...";
 
-</header>
+}
 
-<main>
-
-<aside class="sidebar">
-
-<h2>Parâmetros</h2>
-
-</aside>
-
-<section class="mapa">
-
-<div id="map">
-
-Mapa (em breve)
-
-</div>
-
-</section>
-
-<aside class="insights">
-
-<h2>Insights</h2>
-
-<div class="card">
-
-<h3>Pedidos</h3>
-
-<span id="pedidos">0</span>
-
-</div>
-
-<div class="card">
-
-<h3>Oportunidades</h3>
-
-<span id="oportunidades">0</span>
-
-</div>
-
-<div class="card">
-
-<h3>Receita Potencial</h3>
-
-<span id="receita">0€</span>
-
-</div>
-
-</aside>
-
-</main>
-
-<section class="bottom">
-
-<h2>Oportunidades Encontradas</h2>
-
-<div id="lista">
-
-Nenhuma oportunidade encontrada.
-
-</div>
-
-</section>
-
-<script src="app.js"></script>
-
-</body>
-
-</html>
+carregarPedidos();
