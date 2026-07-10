@@ -67,13 +67,36 @@ function desenharPedidos() {
       }
 
     )
-      .bindPopup(
+.bindPopup(`
 
-        `<b>${p["Pickup Cidade"] || "Sem cidade"}</b><br>
-         ${p["Transport Type"]}<br>
-         ${(Number(p["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €`
+<b>Pedido #${p["ID"]}</b>
 
-      )
+<hr>
+
+<b>📍 Pickup</b><br>
+${p["Pickup"]}<br>
+${p["Pickup Cidade"]}
+
+<br><br>
+
+<b>🏁 Dropoff</b><br>
+${p["Dropoff"]}<br>
+${p["Dropoff Cidade"]}
+
+<br><br>
+
+💰 <b>${Number(p["Monthly Fee"] || 0).toLocaleString("pt-PT")} € / mês</b>
+
+<br>
+
+👥 ${p["Transport Type"]}
+
+<br>
+
+📅 ${p["Dias"]}
+
+`);
+
 
       .addTo(marcadores);
 
