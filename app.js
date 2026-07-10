@@ -29,21 +29,23 @@ async function carregarPedidos() {
 // Atualiza os cartões
 function atualizarDashboard(pedidos) {
 
-    // Nº de pedidos
-    document.getElementById("totalPedidos").innerText = pedidos.length;
+    // Número de pedidos
+    document.getElementById("pedidos").innerText = pedidos.length;
 
     // Receita potencial
-    const receita = pedidos.reduce((total, p) => {
+    let receita = 0;
 
-        return total + Number(p["Monthly Fee"] || 0);
+    pedidos.forEach(p => {
 
-    }, 0);
+        receita += Number(p["Monthly Fee"]) || 0;
 
-    document.getElementById("receitaPotencial").innerText =
+    });
+
+    document.getElementById("receita").innerText =
         receita.toLocaleString("pt-PT") + " €";
 
-    // Ainda vamos calcular isto mais tarde
-    document.getElementById("totalOportunidades").innerText = "...";
+    // Ainda vamos calcular as oportunidades
+    document.getElementById("oportunidades").innerText = "...";
 
 }
 
