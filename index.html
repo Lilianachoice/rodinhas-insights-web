@@ -25,7 +25,7 @@
 
 <div class="logo">
 
-<img src="assets/logo.png">
+<img src="assets/logo.png" alt="Rodinhas">
 
 <div>
 
@@ -51,6 +51,10 @@
 
 <main>
 
+<!-- ========================= -->
+<!-- Sidebar -->
+<!-- ========================= -->
+
 <aside class="sidebar">
 
 <h2>Regras Operacionais</h2>
@@ -61,9 +65,21 @@
 
 <div class="checks">
 
-<label><input type="checkbox" id="shared" checked> Shared</label>
+<label>
 
-<label><input type="checkbox" id="private"> Private</label>
+<input type="checkbox" id="shared" checked>
+
+Shared
+
+</label>
+
+<label>
+
+<input type="checkbox" id="private">
+
+Private
+
+</label>
 
 </div>
 
@@ -73,13 +89,16 @@
 
 <label>Lotação máxima da viatura</label>
 
-<input type="range"
+<input
+type="range"
 id="capacidade"
 min="1"
 max="9"
 value="7">
 
-<span id="valorCapacidade">7 lugares</span>
+<span class="valorParametro" id="valorCapacidade">
+7 lugares
+</span>
 
 </div>
 
@@ -87,14 +106,17 @@ value="7">
 
 <label>Tempo máximo na viatura</label>
 
-<input type="range"
+<input
+type="range"
 id="tempoViatura"
 min="30"
 max="120"
 step="15"
 value="90">
 
-<span id="valorTempo">90 minutos</span>
+<span class="valorParametro" id="valorTempo">
+90 minutos
+</span>
 
 </div>
 
@@ -102,13 +124,16 @@ value="90">
 
 <label>Distância máxima entre Pickups</label>
 
-<input type="range"
+<input
+type="range"
 id="pickupKm"
 min="1"
 max="40"
 value="10">
 
-<span id="valorPickup">10 km</span>
+<span class="valorParametro" id="valorPickup">
+10 km
+</span>
 
 </div>
 
@@ -116,13 +141,16 @@ value="10">
 
 <label>Distância máxima entre Dropoffs</label>
 
-<input type="range"
+<input
+type="range"
 id="dropoffKm"
 min="1"
 max="40"
 value="10">
 
-<span id="valorDropoff">10 km</span>
+<span class="valorParametro" id="valorDropoff">
+10 km
+</span>
 
 </div>
 
@@ -130,14 +158,17 @@ value="10">
 
 <label>Valor mínimo mensal</label>
 
-<input type="range"
+<input
+type="range"
 id="valorMinimo"
 min="0"
 max="2000"
 step="50"
 value="0">
 
-<span id="valorMensal">0 €</span>
+<span class="valorParametro" id="valorMensal">
+0 €
+</span>
 
 </div>
 
@@ -189,6 +220,10 @@ value="0">
 
 </aside>
 
+<!-- ========================= -->
+<!-- MAPA -->
+<!-- ========================= -->
+
 <section class="mapa">
 
 <div id="map">
@@ -198,6 +233,10 @@ Mapa (em breve)
 </div>
 
 </section>
+
+<!-- ========================= -->
+<!-- INSIGHTS -->
+<!-- ========================= -->
 
 <aside class="insights">
 
@@ -215,7 +254,7 @@ Mapa (em breve)
 
 <h3>Oportunidades</h3>
 
-<span id="oportunidades">0</span>
+<span id="oportunidades">...</span>
 
 </div>
 
@@ -223,7 +262,7 @@ Mapa (em breve)
 
 <h3>Receita Potencial</h3>
 
-<span id="receita">0€</span>
+<span id="receita">0 €</span>
 
 </div>
 
