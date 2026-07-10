@@ -53,7 +53,139 @@
 
 <aside class="sidebar">
 
-<h2>Parâmetros</h2>
+<h2>Regras Operacionais</h2>
+
+<div class="param">
+
+<label>Tipo de transporte</label>
+
+<div class="checks">
+
+<label><input type="checkbox" id="shared" checked> Shared</label>
+
+<label><input type="checkbox" id="private"> Private</label>
+
+</div>
+
+</div>
+
+<div class="param">
+
+<label>Lotação máxima da viatura</label>
+
+<input type="range"
+id="capacidade"
+min="1"
+max="9"
+value="7">
+
+<span id="valorCapacidade">7 lugares</span>
+
+</div>
+
+<div class="param">
+
+<label>Tempo máximo na viatura</label>
+
+<input type="range"
+id="tempoViatura"
+min="30"
+max="120"
+step="15"
+value="90">
+
+<span id="valorTempo">90 minutos</span>
+
+</div>
+
+<div class="param">
+
+<label>Distância máxima entre Pickups</label>
+
+<input type="range"
+id="pickupKm"
+min="1"
+max="40"
+value="10">
+
+<span id="valorPickup">10 km</span>
+
+</div>
+
+<div class="param">
+
+<label>Distância máxima entre Dropoffs</label>
+
+<input type="range"
+id="dropoffKm"
+min="1"
+max="40"
+value="10">
+
+<span id="valorDropoff">10 km</span>
+
+</div>
+
+<div class="param">
+
+<label>Valor mínimo mensal</label>
+
+<input type="range"
+id="valorMinimo"
+min="0"
+max="2000"
+step="50"
+value="0">
+
+<span id="valorMensal">0 €</span>
+
+</div>
+
+<div class="param">
+
+<label>Zona</label>
+
+<select id="zona">
+
+<option>Todas</option>
+
+</select>
+
+</div>
+
+<div class="param">
+
+<label>Localidade</label>
+
+<select id="cidade">
+
+<option>Todas</option>
+
+</select>
+
+</div>
+
+<div class="param">
+
+<label>Dias</label>
+
+<select id="dias">
+
+<option>Todos</option>
+
+<option>Monday</option>
+
+<option>Tuesday</option>
+
+<option>Wednesday</option>
+
+<option>Thursday</option>
+
+<option>Friday</option>
+
+</select>
+
+</div>
 
 </aside>
 
