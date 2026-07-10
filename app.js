@@ -1,83 +1,110 @@
-// URL da API do Apps Script
-const API_URL = "https://script.google.com/macros/s/AKfycbxreg3S8D7k7JAUCN3Ti-i8YU09kj7Djxd-ZN8fAgj2Lt-VKQEEMwYYnb5ZfDJ1JZGS/exec";
+// ==========================================
+// Rodinhas Insights
+// ==========================================
 
-// Atualiza a data/hora
+// URL da API Apps Script
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbxreg3S8D7k7JAUCN3Ti-i8YU09kj7Djxd-ZN8fAgj2Lt-VKQEEMwYYnb5ZfDJ1JZGS/exec";
+
+// Última atualização
 document.getElementById("ultimaAtualizacao").innerHTML =
-    new Date().toLocaleString("pt-PT");
+  new Date().toLocaleString("pt-PT");
 
-// Carrega os pedidos
+// ==========================================
+// MAPA
+// ==========================================
+
+const mapa = L.map("map").setView([39.6, -8.0], 7);
+
+L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom: 19,
+    attribution: "© OpenStreetMap"
+  }
+).addTo(mapa);
+
+// Vamos guardar aqui os pedidos
+let pedidos = [];
+
+// ==========================================
+// Carregar pedidos
+// ==========================================
+
 async function carregarPedidos() {
 
-    try {
+  try {
 
-        const response = await fetch(API_URL);
+    const response = await fetch(API_URL);
 
-        const pedidos = await response.json();
+    pedidos = await response.json();
 
-        console.log(pedidos);
+    console.log("Pedidos carregados:", pedidos.length);
 
-        atualizarDashboard(pedidos);
+    atualizarDashboard();
 
-    } catch (erro) {
+  } catch (erro) {
 
-        console.error(erro);
+    console.error(erro);
 
-    }
+  }
+
+}
+
+// ==========================================
+// Dashboard
+// ==========================================
+
+function atualizarDashboard() {
+
+  document.getElementById("pedidos").innerText = pedidos.length;
+
+  const receita = pedidos.reduce((total, pedido) => {
+
+    return total + (Number(pedido["Monthly Fee"]) || 0);
+
+  }, 0);
+
+  document.getElementById("receita").innerText =
+    receita.toLocaleString("pt-PT") + " €";
+
+  document.getElementById("oportunidades").innerText = "...";
 
 }
 
-// Atualiza os cartões
-function atualizarDashboard(pedidos) {
+// ==========================================
+// Sliders
+// ==========================================
 
-    // Número de pedidos
-    document.getElementById("pedidos").innerText = pedidos.length;
+function ligarSlider(idSlider, idTexto, sufixo) {
 
-    // Receita potencial
-    let receita = 0;
+  const slider = document.getElementById(idSlider);
+  const texto = document.getElementById(idTexto);
 
-    pedidos.forEach(p => {
+  if (!slider || !texto)
+    return;
 
-        receita += Number(p["Monthly Fee"]) || 0;
+  function atualizar() {
 
-    });
+    texto.innerText = slider.value + sufixo;
 
-    document.getElementById("receita").innerText =
-        receita.toLocaleString("pt-PT") + " €";
+    // Mais tarde:
+    // aplicarFiltros();
 
-    // Ainda vamos calcular as oportunidades
-    document.getElementById("oportunidades").innerText = "...";
+  }
+
+  atualizar();
+
+  slider.addEventListener("input", atualizar);
 
 }
+
+ligarSlider("capacidade", "valorCapacidade", " lugares");
+ligarSlider("tempoViatura", "valorTempo", " minutos");
+ligarSlider("pickupKm", "valorPickup", " km");
+ligarSlider("dropoffKm", "valorDropoff", " km");
+ligarSlider("valorMinimo", "valorMensal", " €");
+
+// ==========================================
 
 carregarPedidos();
-
-
-// ---------------------------
-// Atualização dos sliders
-// ---------------------------
-
-function ligarSlider(idSlider, idTexto, sufixo){
-
-    const slider = document.getElementById(idSlider);
-    const texto = document.getElementById(idTexto);
-
-    if(!slider || !texto)
-        return;
-
-    function atualizar(){
-
-        texto.innerText = slider.value + sufixo;
-
-    }
-
-    atualizar();
-
-    slider.addEventListener("input", atualizar);
-
-}
-
-ligarSlider("capacidade","valorCapacidade"," lugares");
-ligarSlider("tempoViatura","valorTempo"," minutos");
-ligarSlider("pickupKm","valorPickup"," km");
-ligarSlider("dropoffKm","valorDropoff"," km");
-ligarSlider("valorMinimo","valorMensal"," €");
