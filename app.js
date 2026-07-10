@@ -10,6 +10,8 @@ let mapa;
 let marcadores;
 let pedidos = [];
 
+console.log("Leaflet:", typeof L);
+
 // Última atualização
 document.getElementById("ultimaAtualizacao").innerHTML =
   new Date().toLocaleString("pt-PT");
