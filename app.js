@@ -17,18 +17,21 @@ document.getElementById("ultimaAtualizacao").innerHTML =
 // MAPA
 // ==========================================
 
-const mapa = L.map("map").setView([39.6, -8.0], 7);
+function iniciarMapa() {
 
-L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom: 19,
-    attribution: "© OpenStreetMap"
-  }
-).addTo(mapa);
+    mapa = L.map("map").setView([39.6, -8.0], 7);
 
-// Vamos guardar aqui os pedidos
-let pedidos = [];
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution: "© OpenStreetMap"
+        }
+    ).addTo(mapa);
+
+    marcadores = L.layerGroup().addTo(mapa);
+
+}
 
 // ==========================================
 // Carregar pedidos
