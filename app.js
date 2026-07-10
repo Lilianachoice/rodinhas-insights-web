@@ -6,6 +6,9 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbxreg3S8D7k7JAUCN3Ti-i8YU09kj7Djxd-ZN8fAgj2Lt-VKQEEMwYYnb5ZfDJ1JZGS/exec";
 
+let mapa;
+let marcadores;
+
 // Última atualização
 document.getElementById("ultimaAtualizacao").innerHTML =
   new Date().toLocaleString("pt-PT");
