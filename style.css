@@ -188,3 +188,72 @@ min-height:180px;
 box-shadow:0 5px 20px rgba(0,0,0,.05);
 
 }
+.param{
+
+margin-bottom:24px;
+
+}
+
+.param label{
+
+display:block;
+
+font-size:13px;
+
+font-weight:600;
+
+margin-bottom:8px;
+
+}
+
+.param input[type=range]{
+
+width:100%;
+
+accent-color:#F4C400;
+
+cursor:pointer;
+
+}
+
+.param span{
+
+display:block;
+
+margin-top:6px;
+
+font-size:13px;
+
+color:#666;
+
+}
+
+.param select{
+
+width:100%;
+
+padding:10px;
+
+border-radius:10px;
+
+border:1px solid #DDD;
+
+background:white;
+
+}
+
+.checks{
+
+display:flex;
+
+flex-direction:column;
+
+gap:8px;
+
+}
+
+.checks label{
+
+font-weight:400;
+
+}
