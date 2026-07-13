@@ -29,26 +29,38 @@ function desenharPedidos(listaPedidos) {
 
     marcadores.clearLayers();
 
-    listaPedidos.forEach(p => {
+    listaPedidos.forEach((p, indice) => {
 
-        if (!p["Pickup Lat"])
+        if (!p["Pickup Lat"] || !p["Pickup Lng"])
             return;
+
+        let lat = Number(p["Pickup Lat"]);
+        let lng = Number(p["Pickup Lng"]);
+
+        // Pequeno deslocamento para evitar sobreposição
+        const deslocamento = 0.00008 * indice;
+
+        if (p["Transport Type"] === "Shared") {
+            lat += deslocamento;
+            lng += deslocamento;
+        } else {
+            lat -= deslocamento;
+            lng -= deslocamento;
+        }
 
         const cor =
             p["Transport Type"] === "Shared"
                 ? "#F4C400"
-                : "#333333";
+                : "#444444";
 
         L.circleMarker(
-            [
-                Number(p["Pickup Lat"]),
-                Number(p["Pickup Lng"])
-            ],
+            [lat, lng],
             {
                 radius: 7,
                 color: cor,
                 fillColor: cor,
-                fillOpacity: 0.9
+                fillOpacity: 0.9,
+                weight: 2
             }
         )
         .bindPopup(`
@@ -58,7 +70,9 @@ function desenharPedidos(listaPedidos) {
 
             👥 ${p["Transport Type"]}<br>
 
-            📅 ${p["Dias"]}
+            📅 ${p["Dias"]}<br>
+
+            📍 ${p["Pickup"] || ""}
         `)
         .addTo(marcadores);
 
