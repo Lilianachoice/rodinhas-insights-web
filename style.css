@@ -236,3 +236,16 @@ background:#F4C400;
 background:#444;
 
 }
+.clusterLabel{
+
+    background:transparent;
+    border:none;
+    box-shadow:none;
+
+    color:white;
+
+    font-weight:700;
+
+    font-size:13px;
+
+}
