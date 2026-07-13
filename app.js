@@ -29,7 +29,7 @@ async function carregarPedidos() {
 
     const pedidosFiltrados = obterPedidosFiltrados(pedidos);
 
-    atualizarDashboard();
+    atualizarDashboard(pedidosFiltrados);
 
     desenharPedidos(pedidosFiltrados);
 
@@ -45,11 +45,12 @@ async function carregarPedidos() {
 // Dashboard
 // ==========================================
 
-function atualizarDashboard() {
+function atualizarDashboard(listaPedidos) {
 
-  document.getElementById("pedidos").innerText = pedidos.length;
+  document.getElementById("pedidos").innerText =
+    listaPedidos.length;
 
-  const receita = pedidos.reduce((total, pedido) => {
+  const receita = listaPedidos.reduce((total, pedido) => {
 
     return total + (Number(pedido["Monthly Fee"]) || 0);
 
