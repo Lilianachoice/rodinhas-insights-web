@@ -96,4 +96,4 @@ function desenharPedidos(clusters) {
     });
 
 }
-console.log("Mapa.js carregado");
+console.log("MAPA NOVO 13 JULHO");
