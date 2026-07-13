@@ -65,22 +65,26 @@ function atualizarDashboard(listaPedidos) {
 
 function ligarSlider(idSlider, idTexto, sufixo) {
 
-  const slider = document.getElementById(idSlider);
-  const texto = document.getElementById(idTexto);
+    const slider = document.getElementById(idSlider);
+    const texto = document.getElementById(idTexto);
 
-  if (!slider || !texto)
-    return;
+    if (!slider || !texto)
+        return;
 
-  function atualizar() {
+    function atualizar() {
 
+        texto.innerText = slider.value + sufixo;
+
+        // Só atualiza o mapa depois de ele existir
+        if (mapa)
+            atualizarTudo();
+
+    }
+
+    // Apenas atualiza o texto inicialmente
     texto.innerText = slider.value + sufixo;
 
-    atualizarTudo();
-
-}
-  atualizar();
-
-  slider.addEventListener("input", atualizar);
+    slider.addEventListener("input", atualizar);
 
 }
 
