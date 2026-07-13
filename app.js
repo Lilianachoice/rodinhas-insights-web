@@ -103,3 +103,14 @@ iniciarMapa();
 carregarPedidos();
 
 console.log("App.js carregado");
+
+function atualizarTudo() {
+
+    const pedidosFiltrados =
+        obterPedidosFiltrados(pedidos);
+
+    atualizarDashboard(pedidosFiltrados);
+
+    desenharPedidos(pedidosFiltrados);
+
+}
