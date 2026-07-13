@@ -105,9 +105,12 @@ function atualizarTudo() {
     const pedidosFiltrados =
         obterPedidosFiltrados(pedidos);
 
+    const clusters =
+        criarClusters(pedidosFiltrados);
+
     atualizarDashboard(pedidosFiltrados);
 
-    desenharPedidos(pedidosFiltrados);
+    desenharPedidos(clusters);
 
 }
 document
