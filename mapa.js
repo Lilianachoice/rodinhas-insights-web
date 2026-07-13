@@ -65,3 +65,4 @@ function desenharPedidos(listaPedidos) {
     });
 
 }
+console.log("Mapa.js carregado");
