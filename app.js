@@ -29,11 +29,11 @@ async function carregarPedidos() {
 
     pedidos = await response.json();
 
-    console.log("Pedidos carregados:", pedidos.length);
+    const pedidosFiltrados = obterPedidosFiltrados(pedidos);
 
     atualizarDashboard();
 
-    desenharPedidos(pedidos);
+    desenharPedidos(pedidosFiltrados);
 
   } catch (erro) {
 
