@@ -11,3 +11,4 @@ function obterPedidosFiltrados(listaPedidos) {
     return listaPedidos;
 
 }
+console.log("Clusters.js carregado");
