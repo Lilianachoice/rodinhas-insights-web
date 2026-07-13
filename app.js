@@ -110,3 +110,10 @@ function atualizarTudo() {
     desenharPedidos(pedidosFiltrados);
 
 }
+document
+    .getElementById("shared")
+    .addEventListener("change", atualizarTudo);
+
+document
+    .getElementById("private")
+    .addEventListener("change", atualizarTudo);
