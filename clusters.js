@@ -64,7 +64,6 @@ function obterPedidosFiltrados(listaPedidos) {
 // ==========================================
 
 function criarClusters(listaPedidos) {
-console.log("Pedidos recebidos:", listaPedidos.length);
 
     const distanciaMaxima =
         Number(document.getElementById("pickupKm").value);
@@ -80,13 +79,16 @@ console.log("Pedidos recebidos:", listaPedidos.length);
 
         const pedidoBase = listaPedidos[i];
 
-        if (!pedidoBase["Pickup Lat"] || !pedidoBase["Pickup Lng"])
+        const latBase = Number(pedidoBase["Pickup Lat"]);
+        const lngBase = Number(pedidoBase["Pickup Lng"]);
+
+        if (isNaN(latBase) || isNaN(lngBase))
             continue;
 
         const grupo = {
 
-            lat: Number(pedidoBase["Pickup Lat"]),
-            lng: Number(pedidoBase["Pickup Lng"]),
+            lat: latBase,
+            lng: lngBase,
 
             shared: 0,
             private: 0,
@@ -104,16 +106,19 @@ console.log("Pedidos recebidos:", listaPedidos.length);
 
             const pedido = listaPedidos[j];
 
-            if (!pedido["Pickup Lat"] || !pedido["Pickup Lng"])
+            const lat = Number(pedido["Pickup Lat"]);
+            const lng = Number(pedido["Pickup Lng"]);
+
+            if (isNaN(lat) || isNaN(lng))
                 continue;
 
             const distancia = calcularDistancia(
 
-                Number(pedidoBase["Pickup Lat"]),
-                Number(pedidoBase["Pickup Lng"]),
+                latBase,
+                lngBase,
 
-                Number(pedido["Pickup Lat"]),
-                Number(pedido["Pickup Lng"])
+                lat,
+                lng
 
             );
 
@@ -137,7 +142,9 @@ console.log("Pedidos recebidos:", listaPedidos.length);
         grupos.push(grupo);
 
     }
-console.log("Clusters criados:", grupos.length);
+
+    console.log("Clusters criados:", grupos.length);
+
     return grupos;
 
 }
