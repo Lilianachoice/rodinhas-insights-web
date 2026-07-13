@@ -75,11 +75,9 @@ function ligarSlider(idSlider, idTexto, sufixo) {
 
     texto.innerText = slider.value + sufixo;
 
-    // Mais tarde:
-    // aplicarFiltros();
+    atualizarTudo();
 
-  }
-
+}
   atualizar();
 
   slider.addEventListener("input", atualizar);
