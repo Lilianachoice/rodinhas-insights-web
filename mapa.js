@@ -22,59 +22,76 @@ function iniciarMapa() {
 }
 
 // ==========================================
-// DESENHAR PEDIDOS
+// DESENHAR CLUSTERS
 // ==========================================
 
-function desenharPedidos(listaPedidos) {
+function desenharPedidos(clusters) {
 
     marcadores.clearLayers();
 
-    listaPedidos.forEach((p, indice) => {
+    clusters.forEach(cluster => {
 
-        if (!p["Pickup Lat"] || !p["Pickup Lng"])
-            return;
+        let cor = "#2196F3"; // misto (azul)
 
-        let lat = Number(p["Pickup Lat"]);
-        let lng = Number(p["Pickup Lng"]);
+        if (cluster.shared > 0 && cluster.private == 0)
+            cor = "#F4C400";
 
-        // Pequeno deslocamento para evitar sobreposição
-        const deslocamento = 0.00008 * indice;
+        if (cluster.private > 0 && cluster.shared == 0)
+            cor = "#444444";
 
-        if (p["Transport Type"] === "Shared") {
-            lat += deslocamento;
-            lng += deslocamento;
-        } else {
-            lat -= deslocamento;
-            lng -= deslocamento;
-        }
+        const total =
+            cluster.shared + cluster.private;
 
-        const cor =
-            p["Transport Type"] === "Shared"
-                ? "#F4C400"
-                : "#444444";
+        const marcador = L.circleMarker(
 
-        L.circleMarker(
-            [lat, lng],
+            [cluster.lat, cluster.lng],
+
             {
-                radius: 7,
+                radius: 10 + Math.min(total, 10),
+
                 color: cor,
                 fillColor: cor,
                 fillOpacity: 0.9,
                 weight: 2
             }
-        )
-        .bindPopup(`
-            <b>${p["Pickup Cidade"] || "Sem cidade"}</b><br>
 
-            💶 ${(Number(p["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €<br>
+        ).addTo(marcadores);
 
-            👥 ${p["Transport Type"]}<br>
+        marcador.bindTooltip(
 
-            📅 ${p["Dias"]}<br>
+            String(total),
 
-            📍 ${p["Pickup"] || ""}
-        `)
-        .addTo(marcadores);
+            {
+                permanent: true,
+                direction: "center",
+                className: "clusterLabel"
+            }
+
+        );
+
+        marcador.bindPopup(`
+
+            <b>${cluster.pedidos[0]["Pickup Cidade"] || "Sem cidade"}</b>
+
+            <br><br>
+
+            <b>${total}</b> pedidos
+
+            <br><br>
+
+            🟡 Shared: ${cluster.shared}<br>
+
+            ⚫ Private: ${cluster.private}
+
+            <br><br>
+
+            💶 Receita mensal
+
+            <br>
+
+            <b>${cluster.receita.toLocaleString("pt-PT")} €</b>
+
+        `);
 
     });
 
