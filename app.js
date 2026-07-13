@@ -101,3 +101,5 @@ ligarSlider("valorMinimo", "valorMensal", " €");
 iniciarMapa();
 
 carregarPedidos();
+
+console.log("App.js carregado");
