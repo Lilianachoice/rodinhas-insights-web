@@ -27,11 +27,7 @@ async function carregarPedidos() {
 
     pedidos = await response.json();
 
-    const pedidosFiltrados = obterPedidosFiltrados(pedidos);
-
-    atualizarDashboard(pedidosFiltrados);
-
-    desenharPedidos(pedidosFiltrados);
+    atualizarTudo();
 
   } catch (erro) {
 
