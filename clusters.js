@@ -1,14 +1,31 @@
 // ==========================================
-// CLUSTERS
+// FILTROS
 // ==========================================
 
 function obterPedidosFiltrados(listaPedidos) {
 
-    // Para já devolvemos todos.
-    // Nos próximos passos vamos aplicar os filtros
-    // da sidebar aqui.
+    const mostrarShared =
+        document.getElementById("shared").checked;
 
-    return listaPedidos;
+    const mostrarPrivate =
+        document.getElementById("private").checked;
+
+    return listaPedidos.filter(p => {
+
+        if (
+            p["Transport Type"] === "Shared" &&
+            !mostrarShared
+        )
+            return false;
+
+        if (
+            p["Transport Type"] === "Private" &&
+            !mostrarPrivate
+        )
+            return false;
+
+        return true;
+
+    });
 
 }
-console.log("Clusters.js carregado");
