@@ -64,6 +64,7 @@ function obterPedidosFiltrados(listaPedidos) {
 // ==========================================
 
 function criarClusters(listaPedidos) {
+console.log("Pedidos recebidos:", listaPedidos.length);
 
     const distanciaMaxima =
         Number(document.getElementById("pickupKm").value);
@@ -136,7 +137,7 @@ function criarClusters(listaPedidos) {
         grupos.push(grupo);
 
     }
-
+console.log("Clusters criados:", grupos.length);
     return grupos;
 
 }
