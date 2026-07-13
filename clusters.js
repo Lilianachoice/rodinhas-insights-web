@@ -49,47 +49,78 @@ function obterPedidosFiltrados(listaPedidos) {
 
 function criarClusters(listaPedidos) {
 
-    const grupos = {};
+    const distanciaMaxima =
+        Number(document.getElementById("pickupKm").value);
 
-    listaPedidos.forEach(p => {
+    const grupos = [];
 
-        if (!p["Pickup Lat"] || !p["Pickup Lng"])
-            return;
+    const utilizados = new Array(listaPedidos.length).fill(false);
 
-        const chave =
-            Number(p["Pickup Lat"]).toFixed(5) + "_" +
-            Number(p["Pickup Lng"]).toFixed(5);
+    for (let i = 0; i < listaPedidos.length; i++) {
 
-        if (!grupos[chave]) {
+        if (utilizados[i])
+            continue;
 
-            grupos[chave] = {
+        const pedidoBase = listaPedidos[i];
 
-                lat: Number(p["Pickup Lat"]),
-                lng: Number(p["Pickup Lng"]),
+        if (!pedidoBase["Pickup Lat"] || !pedidoBase["Pickup Lng"])
+            continue;
 
-                shared: 0,
-                private: 0,
+        const grupo = {
 
-                receita: 0,
+            lat: Number(pedidoBase["Pickup Lat"]),
+            lng: Number(pedidoBase["Pickup Lng"]),
 
-                pedidos: []
+            shared: 0,
+            private: 0,
 
-            };
+            receita: 0,
+
+            pedidos: []
+
+        };
+
+        for (let j = i; j < listaPedidos.length; j++) {
+
+            if (utilizados[j])
+                continue;
+
+            const pedido = listaPedidos[j];
+
+            if (!pedido["Pickup Lat"] || !pedido["Pickup Lng"])
+                continue;
+
+            const distancia = calcularDistancia(
+
+                Number(pedidoBase["Pickup Lat"]),
+                Number(pedidoBase["Pickup Lng"]),
+
+                Number(pedido["Pickup Lat"]),
+                Number(pedido["Pickup Lng"])
+
+            );
+
+            if (distancia > distanciaMaxima)
+                continue;
+
+            utilizados[j] = true;
+
+            grupo.pedidos.push(pedido);
+
+            grupo.receita += Number(pedido["Monthly Fee"]) || 0;
+
+            if (pedido["Transport Type"] === "Shared")
+                grupo.shared++;
+
+            if (pedido["Transport Type"] === "Private")
+                grupo.private++;
 
         }
 
-        grupos[chave].pedidos.push(p);
+        grupos.push(grupo);
 
-        grupos[chave].receita += Number(p["Monthly Fee"]) || 0;
+    }
 
-        if (p["Transport Type"] === "Shared")
-            grupos[chave].shared++;
-
-        if (p["Transport Type"] === "Private")
-            grupos[chave].private++;
-
-    });
-
-    return Object.values(grupos);
+    return grupos;
 
 }
