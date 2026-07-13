@@ -28,15 +28,31 @@ function calcularDistancia(lat1, lng1, lat2, lng2) {
 
 function obterPedidosFiltrados(listaPedidos) {
 
-    const usarShared = document.getElementById("shared").checked;
-    const usarPrivate = document.getElementById("private").checked;
+    const usarShared =
+        document.getElementById("shared").checked;
+
+    const usarPrivate =
+        document.getElementById("private").checked;
+
+    const valorMinimo =
+        Number(document.getElementById("valorMinimo").value);
 
     return listaPedidos.filter(p => {
+
+        // Shared / Private
 
         if (p["Transport Type"] === "Shared" && !usarShared)
             return false;
 
         if (p["Transport Type"] === "Private" && !usarPrivate)
+            return false;
+
+        // Valor mínimo
+
+        const mensal =
+            Number(p["Monthly Fee"]) || 0;
+
+        if (mensal < valorMinimo)
             return false;
 
         return true;
