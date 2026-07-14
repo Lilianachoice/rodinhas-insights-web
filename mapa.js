@@ -5,10 +5,13 @@
 let mapa;
 let marcadores;
 
-// Marcadores dos clusters
+// Guarda todos os marcadores dos clusters
 const marcadoresClusters = {};
 
-// Cluster atualmente selecionado
+// Lista dos clusters atualmente desenhados
+let clustersAtuais = [];
+
+// Cluster selecionado
 let clusterSelecionado = null;
 
 // ==========================================
@@ -20,11 +23,17 @@ function iniciarMapa() {
     mapa = L.map("map").setView([39.6, -8.0], 7);
 
     L.tileLayer(
+
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
         {
+
             maxZoom: 19,
+
             attribution: "© OpenStreetMap"
+
         }
+
     ).addTo(mapa);
 
     marcadores = L.layerGroup().addTo(mapa);
@@ -37,10 +46,14 @@ function iniciarMapa() {
 
 function desenharPedidos(clusters) {
 
+    clustersAtuais = clusters;
+
     marcadores.clearLayers();
 
     Object.keys(marcadoresClusters).forEach(id => {
+
         delete marcadoresClusters[id];
+
     });
 
     clusters.forEach((cluster, indice) => {
@@ -60,15 +73,26 @@ function desenharPedidos(clusters) {
 
         const marcador = L.circleMarker(
 
-            [cluster.lat, cluster.lng],
+            [
+
+                cluster.lat,
+
+                cluster.lng
+
+            ],
 
             {
+
                 radius: 10 + Math.min(total, 10),
 
                 color: cor,
+
                 fillColor: cor,
+
                 fillOpacity: 0.9,
+
                 weight: 2
+
             }
 
         ).addTo(marcadores);
@@ -78,20 +102,28 @@ function desenharPedidos(clusters) {
             String(total),
 
             {
+
                 permanent: true,
+
                 direction: "center",
+
                 className: "clusterLabel"
+
             }
 
         );
 
         marcador.bindPopup(
+
             criarPopup(cluster)
+
         );
 
         marcador.on("click", () => {
 
             clusterSelecionado = cluster;
+
+            mostrarDetalheCluster(cluster);
 
         });
 
@@ -102,7 +134,7 @@ function desenharPedidos(clusters) {
 }
 
 // ==========================================
-// CRIAR POPUP
+// POPUP
 // ==========================================
 
 function criarPopup(cluster) {
@@ -113,281 +145,250 @@ function criarPopup(cluster) {
     const total =
         cluster.pedidos.length;
 
-    let tipo = "";
-    let resumo = "";
+    let cor = "🔵";
+    let tipo = "Misto";
 
     if (cluster.shared > 0 && cluster.private === 0) {
 
-        tipo = "🟡 Shared";
-
-        resumo = `
-            <div class="popupNumero">
-                👥 ${total} pedidos
-            </div>
-        `;
+        cor = "🟡";
+        tipo = "Shared";
 
     }
 
-    else if (cluster.private > 0 && cluster.shared === 0) {
+    if (cluster.private > 0 && cluster.shared === 0) {
 
-        tipo = "⚫ Private";
-
-        resumo = `
-            <div class="popupNumero">
-                👥 ${total} pedidos
-            </div>
-        `;
-
-    }
-
-    else {
-
-        tipo = "🔵 Cluster Misto";
-
-        resumo = `
-            <div class="popupNumero">
-                👥 ${total} pedidos
-            </div>
-
-            <div class="popupTipos">
-
-                🟡 Shared: ${cluster.shared}
-
-                <br>
-
-                ⚫ Private: ${cluster.private}
-
-            </div>
-        `;
+        cor = "⚫";
+        tipo = "Private";
 
     }
 
     return `
 
-        <div class="popupCluster">
+<div class="popupCluster">
 
-            <div class="popupCidade">
+    <div class="popupCidade">
 
-                📍 ${cidade}
+        📍 ${cidade}
 
-            </div>
+    </div>
 
-            <div class="popupTipo">
+    <div class="popupTipo">
 
-                ${tipo}
+        ${cor} ${tipo}
 
-            </div>
+    </div>
 
-            <hr>
+    <hr>
 
-            ${resumo}
+    <div class="popupNumero">
 
-            <div class="popupReceita">
+        👥 ${total} pedidos
 
-                💶 <b>${cluster.receita.toLocaleString("pt-PT")} € / mês</b>
+    </div>
 
-            </div>
+    <div class="popupReceita">
 
-            <hr>
+        💶 <b>${cluster.receita.toLocaleString("pt-PT")} € / mês</b>
 
-            ${criarListaPedidos(cluster)}
+    </div>
 
-            <hr>
+    <hr>
 
-            <div
-                class="popupLink"
-                onclick="mostrarPedidosCluster(${cluster.id})">
+    <div
+        class="popupLink"
+        onclick="mostrarPedidosCluster(${cluster.id})">
 
-                Ver todos os pedidos →
+        Ver detalhe do cluster →
 
-            </div>
+    </div>
 
-        </div>
+</div>
 
-    `;
-
-}
-// ==========================================
-// LISTA DOS PEDIDOS DO CLUSTER
-// ==========================================
-
-function criarListaPedidos(cluster) {
-
-    const limite = 5;
-
-    let html = `
-        <div class="popupListaTitulo">
-            Pedidos do cluster
-        </div>
-    `;
-
-    cluster.pedidos
-        .slice(0, limite)
-        .forEach(pedido => {
-
-            const tipo =
-                pedido["Transport Type"] === "Private"
-                    ? "⚫"
-                    : "🟡";
-
-            const id =
-                pedido["ID"] || "-";
-
-            const valor =
-                Number(pedido["Monthly Fee"]) || 0;
-
-            html += `
-
-                <div class="popupPedido">
-
-                    <span>
-
-                        ${tipo}
-                        #${id}
-
-                    </span>
-
-                    <span>
-
-                        ${valor.toLocaleString("pt-PT")} €
-
-                    </span>
-
-                </div>
-
-            `;
-
-        });
-
-    if (cluster.pedidos.length > limite) {
-
-        html += `
-
-            <div class="popupMais">
-
-                ... e mais ${cluster.pedidos.length - limite} pedidos
-
-            </div>
-
-        `;
-
-    }
-
-    return html;
+`;
 
 }
-
 // ==========================================
-// MOSTRAR TODOS OS PEDIDOS
+// MOSTRAR DETALHE DO CLUSTER
 // ==========================================
 
 function mostrarPedidosCluster(id) {
 
-    const marcador =
-        marcadoresClusters[id];
+    const cluster =
+        clustersAtuais.find(c => c.id === id);
 
-    if (!marcador)
+    if (!cluster)
         return;
 
-    clusterSelecionado = null;
+    mostrarDetalheCluster(cluster);
 
-    marcador.closePopup();
+    document
+        .getElementById("detalheCluster")
+        .scrollIntoView({
 
-    // procura novamente o cluster
+            behavior: "smooth"
 
-    Object.values(marcadoresClusters).forEach(m => {
+        });
 
-        if (m === marcador)
-            return;
+}
 
-    });
+function mostrarDetalheCluster(cluster) {
 
-    // procura na lista desenhada
+    const detalhe =
+        document.getElementById("detalheCluster");
 
-    if (typeof clustersAtuais !== "undefined") {
-
-        clusterSelecionado =
-            clustersAtuais.find(c => c.id === id);
-
-    }
-
-    if (!clusterSelecionado)
+    if (!detalhe)
         return;
 
-    const lista =
-        document.getElementById("lista");
-
-    if (!lista)
-        return;
+    const total =
+        cluster.pedidos.length;
 
     let html = `
 
-        <h3>
+<div class="clusterHeader">
 
-            Cluster de
-            ${clusterSelecionado.pedidos[0]["Pickup Cidade"] || "Sem cidade"}
+    <div>
 
-        </h3>
+        <div class="clusterTitulo">
 
-        <br>
+            ${cluster.pedidos[0]["Pickup Cidade"] || "Sem cidade"}
 
-        <b>${clusterSelecionado.pedidos.length}</b> pedidos
+        </div>
 
-        <br><br>
+        <div class="clusterSubtitulo">
 
-        <table class="tabelaPedidos">
+            Cluster selecionado
 
-            <tr>
+        </div>
 
-                <th>ID</th>
+    </div>
 
-                <th>Tipo</th>
+    <div class="clusterReceita">
 
-                <th>Mensalidade</th>
+        ${cluster.receita.toLocaleString("pt-PT")} €
 
-            </tr>
+    </div>
 
-    `;
+</div>
 
-    clusterSelecionado.pedidos.forEach(p => {
+<div class="clusterInfo">
+
+    <div class="infoBox">
+
+        <div class="infoTitulo">
+
+            Pedidos
+
+        </div>
+
+        <div class="infoValor">
+
+            ${total}
+
+        </div>
+
+    </div>
+
+    <div class="infoBox">
+
+        <div class="infoTitulo">
+
+            Shared
+
+        </div>
+
+        <div class="infoValor">
+
+            ${cluster.shared}
+
+        </div>
+
+    </div>
+
+    <div class="infoBox">
+
+        <div class="infoTitulo">
+
+            Private
+
+        </div>
+
+        <div class="infoValor">
+
+            ${cluster.private}
+
+        </div>
+
+    </div>
+
+</div>
+
+<table class="tabelaPedidos">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Tipo</th>
+
+<th>Mensalidade</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+    cluster.pedidos.forEach(pedido => {
+
+        const tipo =
+
+            pedido["Transport Type"] === "Shared"
+
+                ? '<span class="tipoShared">Shared</span>'
+
+                : '<span class="tipoPrivate">Private</span>';
 
         html += `
 
-            <tr>
+<tr>
 
-                <td>
+<td>
 
-                    ${p["ID"]}
+${pedido["ID"] || "-"}
 
-                </td>
+</td>
 
-                <td>
+<td>
 
-                    ${p["Transport Type"]}
+${tipo}
 
-                </td>
+</td>
 
-                <td>
+<td>
 
-                    ${(Number(p["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €
+${(Number(pedido["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €
 
-                </td>
+</td>
 
-            </tr>
+</tr>
 
-        `;
-
-    });
-
-    html += "</table>";
-
-    lista.innerHTML = html;
-
-    lista.scrollIntoView({
-
-        behavior: "smooth"
+`;
 
     });
+
+    html += `
+
+</tbody>
+
+</table>
+
+`;
+
+    detalhe.innerHTML = html;
 
 }
 
@@ -425,118 +426,12 @@ function mostrarCluster(id) {
 
     }, 900);
 
+    const cluster =
+        clustersAtuais.find(c => c.id === id);
+
+    if (cluster)
+        mostrarDetalheCluster(cluster);
+
 }
 
 console.log("Mapa.js carregado");
-function mostrarDetalheCluster(cluster){
-
-    let html = `
-
-        <div class="clusterHeader">
-
-            <div>
-
-                <div class="clusterTitulo">
-
-                    ${cluster.pedidos[0]["Pickup Cidade"] || "Sem cidade"}
-
-                </div>
-
-            </div>
-
-            <div class="clusterReceita">
-
-                ${cluster.receita.toLocaleString("pt-PT")} €
-
-            </div>
-
-        </div>
-
-        <div class="clusterInfo">
-
-            <div class="infoBox">
-
-                <div class="infoTitulo">
-                    Pedidos
-                </div>
-
-                <div class="infoValor">
-                    ${cluster.pedidos.length}
-                </div>
-
-            </div>
-
-            <div class="infoBox">
-
-                <div class="infoTitulo">
-                    Shared
-                </div>
-
-                <div class="infoValor">
-                    ${cluster.shared}
-                </div>
-
-            </div>
-
-            <div class="infoBox">
-
-                <div class="infoTitulo">
-                    Private
-                </div>
-
-                <div class="infoValor">
-                    ${cluster.private}
-                </div>
-
-            </div>
-
-        </div>
-
-        <table class="tabelaPedidos">
-
-            <thead>
-
-                <tr>
-
-                    <th>ID</th>
-
-                    <th>Tipo</th>
-
-                    <th>Mensalidade</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-    `;
-
-    cluster.pedidos.forEach(pedido=>{
-
-        html += `
-
-            <tr>
-
-                <td>${pedido.ID}</td>
-
-                <td>${pedido["Transport Type"]}</td>
-
-                <td>${Number(pedido["Monthly Fee"]||0).toLocaleString("pt-PT")} €</td>
-
-            </tr>
-
-        `;
-
-    });
-
-    html += `
-
-            </tbody>
-
-        </table>
-
-    `;
-
-    document.getElementById("detalheCluster").innerHTML = html;
-
-}
