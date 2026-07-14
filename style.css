@@ -659,3 +659,124 @@ Nenhuma oportunidade encontrada.
     min-height:650px;
 
 }
+.clusterDetalhe{
+
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:30px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+
+    min-height:220px;
+
+}
+
+.clusterVazio{
+
+    text-align:center;
+
+    color:#999;
+
+    font-size:18px;
+
+    padding:60px;
+
+}
+
+.clusterHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.clusterTitulo{
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+.clusterReceita{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:#2E7D32;
+
+}
+
+.clusterInfo{
+
+    display:flex;
+
+    gap:25px;
+
+    margin-bottom:30px;
+
+    flex-wrap:wrap;
+
+}
+
+.infoBox{
+
+    background:#fafafa;
+
+    border-radius:14px;
+
+    padding:15px 20px;
+
+}
+
+.infoTitulo{
+
+    color:#888;
+
+    font-size:13px;
+
+}
+
+.infoValor{
+
+    font-size:22px;
+
+    font-weight:700;
+
+}
+
+.tabelaPedidos{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:15px;
+
+}
+
+.tabelaPedidos th{
+
+    text-align:left;
+
+    padding:12px;
+
+    border-bottom:2px solid #eee;
+
+}
+
+.tabelaPedidos td{
+
+    padding:12px;
+
+    border-bottom:1px solid #f1f1f1;
+
+}
