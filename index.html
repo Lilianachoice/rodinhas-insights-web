@@ -3,23 +3,21 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rodinhas Insights</title>
 
-<title>Rodinhas Insights</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-<!-- CSS -->
-<link rel="stylesheet" href="style.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -27,204 +25,171 @@
 
 <header>
 
-<div class="logo">
+    <div class="logo">
 
-<img src="assets/logo.png" alt="Rodinhas">
+        <img src="assets/logo.png" alt="Rodinhas">
 
-<div>
+        <div>
 
-<h1>Rodinhas Insights</h1>
+            <h1>Rodinhas Insights</h1>
+            <p>Business Intelligence para expansão de rotas</p>
 
-<p>Business Intelligence para expansão de rotas</p>
+        </div>
 
-</div>
+    </div>
 
-</div>
+    <div class="last-update">
 
-<div class="last-update">
+        Última atualização
 
-Última atualização
+        <br>
 
-<br>
+        <span id="ultimaAtualizacao">--</span>
 
-<span id="ultimaAtualizacao">--</span>
-
-</div>
+    </div>
 
 </header>
 
 <main>
 
 <!-- ========================= -->
-<!-- Sidebar -->
+<!-- SIDEBAR -->
 <!-- ========================= -->
 
 <aside class="sidebar">
 
-<h2>Regras Operacionais</h2>
+    <h2>Regras Operacionais</h2>
 
-<div class="param">
+    <div class="param">
 
-<label>Tipo de transporte</label>
+        <label>Tipo de transporte</label>
 
-<div class="checks">
+        <div class="checks">
 
-<label class="tipo">
+            <label class="tipo">
 
-<input type="checkbox" id="shared" checked>
+                <input type="checkbox" id="shared" checked>
 
-<span class="cor shared"></span>
+                <span class="cor shared"></span>
 
-Shared
+                Shared
 
-</label>
+            </label>
 
-<label class="tipo">
+            <label class="tipo">
 
-<input type="checkbox" id="private">
+                <input type="checkbox" id="private">
 
-<span class="cor private"></span>
+                <span class="cor private"></span>
 
-Private
+                Private
 
-</label>
+            </label>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Lotação máxima da viatura</label>
+        <label>Lotação máxima da viatura</label>
 
-<input
-type="range"
-id="capacidade"
-min="1"
-max="9"
-value="7">
+        <input type="range" id="capacidade" min="1" max="9" value="7">
 
-<span class="valorParametro" id="valorCapacidade">
-7 lugares
-</span>
+        <span id="valorCapacidade" class="valorParametro">
+            7 lugares
+        </span>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Tempo máximo na viatura</label>
+        <label>Tempo máximo na viatura</label>
 
-<input
-type="range"
-id="tempoViatura"
-min="30"
-max="120"
-step="15"
-value="90">
+        <input type="range" id="tempoViatura" min="30" max="120" step="15" value="90">
 
-<span class="valorParametro" id="valorTempo">
-90 minutos
-</span>
+        <span id="valorTempo" class="valorParametro">
+            90 minutos
+        </span>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Distância máxima entre Pickups</label>
+        <label>Distância máxima entre Pickups</label>
 
-<input
-type="range"
-id="pickupKm"
-min="1"
-max="40"
-value="10">
+        <input type="range" id="pickupKm" min="1" max="40" value="10">
 
-<span class="valorParametro" id="valorPickup">
-10 km
-</span>
+        <span id="valorPickup" class="valorParametro">
+            10 km
+        </span>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Distância máxima entre Dropoffs</label>
+        <label>Distância máxima entre Dropoffs</label>
 
-<input
-type="range"
-id="dropoffKm"
-min="1"
-max="40"
-value="10">
+        <input type="range" id="dropoffKm" min="1" max="40" value="10">
 
-<span class="valorParametro" id="valorDropoff">
-10 km
-</span>
+        <span id="valorDropoff" class="valorParametro">
+            10 km
+        </span>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Valor mínimo mensal</label>
+        <label>Valor mínimo mensal</label>
 
-<input
-type="range"
-id="valorMinimo"
-min="0"
-max="2000"
-step="50"
-value="0">
+        <input type="range" id="valorMinimo" min="0" max="2000" step="50" value="0">
 
-<span class="valorParametro" id="valorMensal">
-0 €
-</span>
+        <span id="valorMensal" class="valorParametro">
+            0 €
+        </span>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Zona</label>
+        <label>Zona</label>
 
-<select id="zona">
+        <select id="zona">
 
-<option>Todas</option>
+            <option>Todas</option>
 
-</select>
+        </select>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Localidade</label>
+        <label>Localidade</label>
 
-<select id="cidade">
+        <select id="cidade">
 
-<option>Todas</option>
+            <option>Todas</option>
 
-</select>
+        </select>
 
-</div>
+    </div>
 
-<div class="param">
+    <div class="param">
 
-<label>Dias</label>
+        <label>Dias</label>
 
-<select id="dias">
+        <select id="dias">
 
-<option>Todos</option>
+            <option>Todos</option>
+            <option>Monday</option>
+            <option>Tuesday</option>
+            <option>Wednesday</option>
+            <option>Thursday</option>
+            <option>Friday</option>
 
-<option>Monday</option>
+        </select>
 
-<option>Tuesday</option>
-
-<option>Wednesday</option>
-
-<option>Thursday</option>
-
-<option>Friday</option>
-
-</select>
-
-</div>
+    </div>
 
 </aside>
 
@@ -237,11 +202,15 @@ value="0">
     <div class="resumoMapa">
 
         <div id="textoResumo" class="textoResumo">
+
             A mostrar 0 pedidos em 0 localizações.
+
         </div>
 
         <div id="textoFiltros" class="textoFiltros">
+
             Filtros ativos: —
+
         </div>
 
     </div>
@@ -256,14 +225,6 @@ value="0">
 
 <aside class="insights">
 
-<h2>Insights</h2>
-
-<div class="card">
-
-<h3>Pedidos</h3>
-
-<aside class="insights">
-
     <h2>Insights</h2>
 
     <div class="insightCard">
@@ -273,11 +234,15 @@ value="0">
         <div class="conteudo">
 
             <div class="tituloInsight">
+
                 Oportunidades
+
             </div>
 
             <div id="insightOportunidades" class="valorInsight">
+
                 --
+
             </div>
 
         </div>
@@ -291,11 +256,15 @@ value="0">
         <div class="conteudo">
 
             <div class="tituloInsight">
+
                 Receita Potencial
+
             </div>
 
             <div id="insightReceita" class="valorInsight">
+
                 --
+
             </div>
 
         </div>
@@ -309,11 +278,15 @@ value="0">
         <div class="conteudo">
 
             <div class="tituloInsight">
+
                 Viaturas Necessárias
+
             </div>
 
             <div id="insightViaturas" class="valorInsight">
+
                 --
+
             </div>
 
         </div>
@@ -327,11 +300,15 @@ value="0">
         <div class="conteudo">
 
             <div class="tituloInsight">
+
                 Melhor Oportunidade
+
             </div>
 
             <div id="insightMelhor" class="valorInsight">
+
                 --
+
             </div>
 
         </div>
@@ -342,22 +319,28 @@ value="0">
 
 </main>
 
+<!-- ========================= -->
+<!-- OPORTUNIDADES -->
+<!-- ========================= -->
+
 <section class="bottom">
 
-<h2>Oportunidades Encontradas</h2>
+    <h2>Oportunidades Encontradas</h2>
 
-<div id="lista">
+    <div id="lista">
 
-Nenhuma oportunidade encontrada.
+        Nenhuma oportunidade encontrada.
 
-</div>
+    </div>
 
 </section>
 
 <!-- Leaflet -->
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Javascript -->
+<!-- JavaScript -->
+
 <script src="mapa.js"></script>
 <script src="clusters.js"></script>
 <script src="app.js"></script>
