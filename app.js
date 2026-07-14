@@ -105,6 +105,10 @@ function atualizarResumoMapa(listaPedidos, clusters) {
 // Insights
 // ==========================================
 
+// ==========================================
+// INSIGHTS
+// ==========================================
+
 function atualizarInsights(listaPedidos, clusters) {
 
     document.getElementById("insightOportunidades").innerText =
@@ -122,11 +126,35 @@ function atualizarInsights(listaPedidos, clusters) {
     document.getElementById("insightReceita").innerText =
         receita.toLocaleString("pt-PT") + " €";
 
+    // Ainda provisório
     document.getElementById("insightViaturas").innerText =
         "--";
 
-    document.getElementById("insightMelhor").innerText =
-        "--";
+    // Melhor cluster
+    let melhor = null;
+
+    clusters.forEach(cluster => {
+
+        if (!melhor || cluster.receita > melhor.receita)
+            melhor = cluster;
+
+    });
+
+    if (melhor) {
+
+        const cidade =
+            melhor.pedidos[0]["Pickup Cidade"] || "Sem cidade";
+
+        document.getElementById("insightMelhor").innerHTML =
+            `${cidade}<br>
+             ${melhor.pedidos.length} pedidos<br>
+             ${melhor.receita.toLocaleString("pt-PT")} €`;
+
+    } else {
+
+        document.getElementById("insightMelhor").innerText = "--";
+
+    }
 
 }
 
