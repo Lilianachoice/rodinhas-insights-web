@@ -5,6 +5,13 @@
 let mapa;
 let marcadores;
 
+// Guarda todos os marcadores dos clusters
+const marcadoresClusters = {};
+
+// ==========================================
+// INICIAR MAPA
+// ==========================================
+
 function iniciarMapa() {
 
     mapa = L.map("map").setView([39.6, -8.0], 7);
@@ -29,9 +36,17 @@ function desenharPedidos(clusters) {
 
     marcadores.clearLayers();
 
-    clusters.forEach(cluster => {
+    // Limpa a lista dos marcadores anteriores
+    Object.keys(marcadoresClusters).forEach(id => {
+        delete marcadoresClusters[id];
+    });
 
-        let cor = "#2196F3"; // misto (azul)
+    clusters.forEach((cluster, indice) => {
+
+        // ID interno do cluster
+        cluster.id = indice;
+
+        let cor = "#2196F3";
 
         if (cluster.shared > 0 && cluster.private == 0)
             cor = "#F4C400";
@@ -53,6 +68,7 @@ function desenharPedidos(clusters) {
                 fillColor: cor,
                 fillOpacity: 0.9,
                 weight: 2
+
             }
 
         ).addTo(marcadores);
@@ -93,7 +109,39 @@ function desenharPedidos(clusters) {
 
         `);
 
+        // Guarda o marcador
+        marcadoresClusters[cluster.id] = marcador;
+
     });
 
 }
-console.log("MAPA NOVO 13 JULHO");
+
+// ==========================================
+// MOSTRAR UM CLUSTER NO MAPA
+// ==========================================
+
+function mostrarCluster(id) {
+
+    const marcador = marcadoresClusters[id];
+
+    if (!marcador)
+        return;
+
+    mapa.flyTo(
+        marcador.getLatLng(),
+        11,
+        {
+            animate: true,
+            duration: 1.2
+        }
+    );
+
+    setTimeout(() => {
+
+        marcador.openPopup();
+
+    }, 900);
+
+}
+
+console.log("MAPA NOVO 14 JULHO");
