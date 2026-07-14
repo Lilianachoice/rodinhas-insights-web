@@ -107,7 +107,9 @@ function atualizarResumoMapa(listaPedidos, clusters) {
 // ==========================================
 
 function atualizarInsights(listaPedidos, clusters) {
-
+    
+    console.log("Entrou em atualizarInsights");
+  
     document.getElementById("insightOportunidades").innerText =
         clusters.length;
 
