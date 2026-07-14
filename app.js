@@ -7,6 +7,7 @@ const API_URL =
     "https://script.google.com/macros/s/AKfycbxreg3S8D7k7JAUCN3Ti-i8YU09kj7Djxd-ZN8fAgj2Lt-VKQEEMwYYnb5ZfDJ1JZGS/exec";
 
 let pedidos = [];
+let clustersAtuais = [];
 
 // Guarda o melhor cluster encontrado
 let melhorCluster = null;
@@ -178,8 +179,11 @@ function atualizarTudo() {
     const pedidosFiltrados =
         obterPedidosFiltrados(pedidos);
 
-    const clusters =
+    clustersAtuais =
         criarClusters(pedidosFiltrados);
+
+    const clusters =
+        clustersAtuais;
 
     atualizarDashboard(
         pedidosFiltrados
