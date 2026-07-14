@@ -993,3 +993,50 @@ Nenhuma oportunidade encontrada.
     transform:translateY(-2px);
 
 }
+/* ===========================
+   ABAS
+=========================== */
+
+.abas{
+
+    display:flex;
+
+    gap:12px;
+
+    padding:20px 30px 0;
+
+    background:#f5f7fb;
+
+}
+
+.aba{
+
+    border:none;
+
+    padding:12px 24px;
+
+    border-radius:10px 10px 0 0;
+
+    background:#d9dde5;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+.aba:hover{
+
+    background:#cfd5df;
+
+}
+
+.aba.ativa{
+
+    background:white;
+
+}
