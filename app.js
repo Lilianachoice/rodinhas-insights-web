@@ -39,30 +39,6 @@ async function carregarPedidos() {
 
 }
 
-// ==========================================
-// Dashboard
-// ==========================================
-
-function atualizarDashboard(listaPedidos) {
-
-    document.getElementById("pedidos").innerText =
-        listaPedidos.length;
-
-    const receita = listaPedidos.reduce(
-
-        (total, pedido) =>
-            total + (Number(pedido["Monthly Fee"]) || 0),
-
-        0
-
-    );
-
-    document.getElementById("receita").innerText =
-        receita.toLocaleString("pt-PT") + " €";
-
-    document.getElementById("oportunidades").innerText = "...";
-
-}
 
 // ==========================================
 // Resumo do mapa
@@ -168,8 +144,6 @@ function atualizarTudo() {
 
     const clusters =
         criarClusters(pedidosFiltrados);
-
-    atualizarDashboard(pedidosFiltrados);
 
     atualizarResumoMapa(
         pedidosFiltrados,
