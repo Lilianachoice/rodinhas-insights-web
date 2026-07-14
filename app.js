@@ -176,31 +176,59 @@ function atualizarInsights(listaPedidos, clusters) {
 function atualizarTudo() {
 
     const pedidosFiltrados =
-        obterPedidosFiltrados(pedidos);
+    obterPedidosFiltrados(pedidos);
 
-    clustersAtuais =
-        criarClusters(pedidosFiltrados);
+// Apenas pedidos com localização válida
+const pedidosMapa = pedidosFiltrados.filter(p => {
 
-    const clusters =
-        clustersAtuais;
+    const lat = Number(p.Latitude);
+    const lng = Number(p.Longitude);
 
-    atualizarDashboard(
-        pedidosFiltrados
+    return (
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat !== 0 &&
+        lng !== 0 &&
+        p["Pickup Cidade"] &&
+        p["Pickup Cidade"].trim() !== ""
     );
 
-    atualizarResumoMapa(
-        pedidosFiltrados,
-        clusters
-    );
+});
 
-    atualizarInsights(
-        pedidosFiltrados,
-        clusters
-    );
+// Guardamos estes para a futura janela de expansão
+const pedidosExpansao = pedidosFiltrados.filter(p => !pedidosMapa.includes(p));
 
-    desenharPedidos(
-        clusters
-    );
+clustersAtuais =
+    criarClusters(pedidosMapa);
+
+const clusters =
+    clustersAtuais;
+
+atualizarDashboard(
+    pedidosMapa
+);
+
+atualizarResumoMapa(
+    pedidosMapa,
+    clusters
+);
+
+atualizarInsights(
+    pedidosMapa,
+    clusters
+);
+
+desenharPedidos(
+    clusters
+);
+
+// Apenas para já, para confirmar que a separação funciona
+console.log(
+    "Mapa:",
+    pedidosMapa.length,
+    "| Expansão:",
+    pedidosExpansao.length
+);
 
 }
 
