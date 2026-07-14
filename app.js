@@ -112,7 +112,48 @@ function atualizarTudo() {
 
     atualizarDashboard(pedidosFiltrados);
 
+    atualizarResumoMapa(
+        pedidosFiltrados,
+        clusters
+    );
+
     desenharPedidos(clusters);
+
+}
+// ==========================================
+// RESUMO DO MAPA
+// ==========================================
+
+function atualizarResumoMapa(listaPedidos, clusters) {
+
+    document.getElementById("textoResumo").innerText =
+        `A mostrar ${listaPedidos.length} pedidos em ${clusters.length} localizações.`;
+
+    const filtros = [];
+
+    const shared =
+        document.getElementById("shared").checked;
+
+    const priv =
+        document.getElementById("private").checked;
+
+    if (shared && priv)
+        filtros.push("Shared + Private");
+    else if (shared)
+        filtros.push("Shared");
+    else if (priv)
+        filtros.push("Private");
+
+    filtros.push(
+        `Pickup ≤ ${document.getElementById("pickupKm").value} km`
+    );
+
+    filtros.push(
+        `Valor ≥ ${document.getElementById("valorMinimo").value} €`
+    );
+
+    document.getElementById("textoFiltros").innerText =
+        "Filtros ativos: " + filtros.join(" • ");
 
 }
 document
