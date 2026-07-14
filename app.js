@@ -4,9 +4,12 @@
 
 // URL da API Apps Script
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbxreg3S8D7k7JAUCN3Ti-i8YU09kj7Djxd-ZN8fAgj2Lt-VKQEEMwYYnb5ZfDJ1JZGS/exec";
+    "https://script.google.com/macros/s/AKfycbxreg3S8D7k7JAUCN3Ti-i8YU09kj7Djxd-ZN8fAgj2Lt-VKQEEMwYYnb5ZfDJ1JZGS/exec";
 
 let pedidos = [];
+
+// Guarda o melhor cluster encontrado
+let melhorCluster = null;
 
 console.log("Leaflet:", typeof L);
 
@@ -31,7 +34,8 @@ async function carregarPedidos() {
 
         atualizarTudo();
 
-    } catch (erro) {
+    }
+    catch (erro) {
 
         console.error(erro);
 
@@ -39,6 +43,36 @@ async function carregarPedidos() {
 
 }
 
+// ==========================================
+// Dashboard (mantido por compatibilidade)
+// ==========================================
+
+function atualizarDashboard(listaPedidos) {
+
+    const receita = listaPedidos.reduce(
+
+        (total, pedido) =>
+            total + (Number(pedido["Monthly Fee"]) || 0),
+
+        0
+
+    );
+
+    const pedidosEl = document.getElementById("pedidos");
+    const receitaEl = document.getElementById("receita");
+    const oportunidadesEl = document.getElementById("oportunidades");
+
+    if (pedidosEl)
+        pedidosEl.innerText = listaPedidos.length;
+
+    if (receitaEl)
+        receitaEl.innerText =
+            receita.toLocaleString("pt-PT") + " €";
+
+    if (oportunidadesEl)
+        oportunidadesEl.innerText = "...";
+
+}
 
 // ==========================================
 // Resumo do mapa
@@ -77,15 +111,12 @@ function atualizarResumoMapa(listaPedidos, clusters) {
 
 }
 
-
 // ==========================================
 // INSIGHTS
 // ==========================================
 
 function atualizarInsights(listaPedidos, clusters) {
-    
-    console.log("Entrou em atualizarInsights");
-  
+
     document.getElementById("insightOportunidades").innerText =
         clusters.length;
 
@@ -101,33 +132,38 @@ function atualizarInsights(listaPedidos, clusters) {
     document.getElementById("insightReceita").innerText =
         receita.toLocaleString("pt-PT") + " €";
 
-    // Ainda provisório
     document.getElementById("insightViaturas").innerText =
         "--";
 
-    // Melhor cluster
-    let melhor = null;
+    // Procurar melhor cluster
+    melhorCluster = null;
 
     clusters.forEach(cluster => {
 
-        if (!melhor || cluster.receita > melhor.receita)
-            melhor = cluster;
+        if (!melhorCluster)
+            melhorCluster = cluster;
+
+        else if (cluster.receita > melhorCluster.receita)
+            melhorCluster = cluster;
 
     });
 
-    if (melhor) {
+    if (melhorCluster) {
 
         const cidade =
-            melhor.pedidos[0]["Pickup Cidade"] || "Sem cidade";
+            melhorCluster.pedidos[0]["Pickup Cidade"] || "Sem cidade";
 
         document.getElementById("insightMelhor").innerHTML =
-            `${cidade}<br>
-             ${melhor.pedidos.length} pedidos<br>
-             ${melhor.receita.toLocaleString("pt-PT")} €`;
+            `
+            ${cidade}<br>
+            ${melhorCluster.pedidos.length} pedidos<br>
+            ${melhorCluster.receita.toLocaleString("pt-PT")} €
+            `;
 
-    } else {
+    }
+    else {
 
-        document.getElementById("insightMelhor").innerText = "--";
+        document.getElementById("insightMelhor").innerHTML = "--";
 
     }
 
@@ -145,6 +181,10 @@ function atualizarTudo() {
     const clusters =
         criarClusters(pedidosFiltrados);
 
+    atualizarDashboard(
+        pedidosFiltrados
+    );
+
     atualizarResumoMapa(
         pedidosFiltrados,
         clusters
@@ -155,7 +195,9 @@ function atualizarTudo() {
         clusters
     );
 
-    desenharPedidos(clusters);
+    desenharPedidos(
+        clusters
+    );
 
 }
 
@@ -194,35 +236,11 @@ function ligarSlider(idSlider, idTexto, sufixo) {
 
 }
 
-ligarSlider(
-    "capacidade",
-    "valorCapacidade",
-    " lugares"
-);
-
-ligarSlider(
-    "tempoViatura",
-    "valorTempo",
-    " minutos"
-);
-
-ligarSlider(
-    "pickupKm",
-    "valorPickup",
-    " km"
-);
-
-ligarSlider(
-    "dropoffKm",
-    "valorDropoff",
-    " km"
-);
-
-ligarSlider(
-    "valorMinimo",
-    "valorMensal",
-    " €"
-);
+ligarSlider("capacidade", "valorCapacidade", " lugares");
+ligarSlider("tempoViatura", "valorTempo", " minutos");
+ligarSlider("pickupKm", "valorPickup", " km");
+ligarSlider("dropoffKm", "valorDropoff", " km");
+ligarSlider("valorMinimo", "valorMensal", " €");
 
 // ==========================================
 // Eventos
@@ -235,6 +253,16 @@ document
 document
     .getElementById("private")
     .addEventListener("change", atualizarTudo);
+
+// Clique no cartão "Melhor oportunidade"
+document
+    .getElementById("insightMelhor")
+    .addEventListener("click", () => {
+
+        if (melhorCluster)
+            mostrarCluster(melhorCluster.id);
+
+    });
 
 // ==========================================
 // Arranque
