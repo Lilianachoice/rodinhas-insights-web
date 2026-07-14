@@ -10,10 +10,12 @@ let pedidos = [];
 
 console.log("Leaflet:", typeof L);
 
+// ==========================================
 // Última atualização
-document.getElementById("ultimaAtualizacao").innerHTML =
-  new Date().toLocaleString("pt-PT");
+// ==========================================
 
+document.getElementById("ultimaAtualizacao").innerHTML =
+    new Date().toLocaleString("pt-PT");
 
 // ==========================================
 // Carregar pedidos
@@ -21,19 +23,19 @@ document.getElementById("ultimaAtualizacao").innerHTML =
 
 async function carregarPedidos() {
 
-  try {
+    try {
 
-    const response = await fetch(API_URL);
+        const response = await fetch(API_URL);
 
-    pedidos = await response.json();
+        pedidos = await response.json();
 
-    atualizarTudo();
+        atualizarTudo();
 
-  } catch (erro) {
+    } catch (erro) {
 
-    console.error(erro);
+        console.error(erro);
 
-  }
+    }
 
 }
 
@@ -43,85 +45,27 @@ async function carregarPedidos() {
 
 function atualizarDashboard(listaPedidos) {
 
-  document.getElementById("pedidos").innerText =
-    listaPedidos.length;
+    document.getElementById("pedidos").innerText =
+        listaPedidos.length;
 
-  const receita = listaPedidos.reduce((total, pedido) => {
+    const receita = listaPedidos.reduce(
 
-    return total + (Number(pedido["Monthly Fee"]) || 0);
+        (total, pedido) =>
+            total + (Number(pedido["Monthly Fee"]) || 0),
 
-  }, 0);
+        0
 
-  document.getElementById("receita").innerText =
-    receita.toLocaleString("pt-PT") + " €";
-
-  document.getElementById("oportunidades").innerText = "...";
-
-}
-
-// ==========================================
-// Sliders
-// ==========================================
-
-function ligarSlider(idSlider, idTexto, sufixo) {
-
-    const slider = document.getElementById(idSlider);
-    const texto = document.getElementById(idTexto);
-
-    if (!slider || !texto)
-        return;
-
-    function atualizar() {
-
-        texto.innerText = slider.value + sufixo;
-
-        // Só atualiza o mapa depois de ele existir
-        if (mapa)
-            atualizarTudo();
-
-    }
-
-    // Apenas atualiza o texto inicialmente
-    texto.innerText = slider.value + sufixo;
-
-    slider.addEventListener("input", atualizar);
-
-}
-
-ligarSlider("capacidade", "valorCapacidade", " lugares");
-ligarSlider("tempoViatura", "valorTempo", " minutos");
-ligarSlider("pickupKm", "valorPickup", " km");
-ligarSlider("dropoffKm", "valorDropoff", " km");
-ligarSlider("valorMinimo", "valorMensal", " €");
-
-// ==========================================
-
-iniciarMapa();
-
-carregarPedidos();
-
-console.log("App.js carregado");
-
-function atualizarTudo() {
-
-    const pedidosFiltrados =
-        obterPedidosFiltrados(pedidos);
-
-    const clusters =
-        criarClusters(pedidosFiltrados);
-
-    atualizarDashboard(pedidosFiltrados);
-
-    atualizarResumoMapa(
-        pedidosFiltrados,
-        clusters
     );
 
-    desenharPedidos(clusters);
+    document.getElementById("receita").innerText =
+        receita.toLocaleString("pt-PT") + " €";
+
+    document.getElementById("oportunidades").innerText = "...";
 
 }
+
 // ==========================================
-// RESUMO DO MAPA
+// Resumo do mapa
 // ==========================================
 
 function atualizarResumoMapa(listaPedidos, clusters) {
@@ -156,6 +100,133 @@ function atualizarResumoMapa(listaPedidos, clusters) {
         "Filtros ativos: " + filtros.join(" • ");
 
 }
+
+// ==========================================
+// Insights
+// ==========================================
+
+function atualizarInsights(listaPedidos, clusters) {
+
+    document.getElementById("insightOportunidades").innerText =
+        clusters.length;
+
+    const receita = listaPedidos.reduce(
+
+        (total, pedido) =>
+            total + (Number(pedido["Monthly Fee"]) || 0),
+
+        0
+
+    );
+
+    document.getElementById("insightReceita").innerText =
+        receita.toLocaleString("pt-PT") + " €";
+
+    document.getElementById("insightViaturas").innerText =
+        "--";
+
+    document.getElementById("insightMelhor").innerText =
+        "--";
+
+}
+
+// ==========================================
+// Atualizar tudo
+// ==========================================
+
+function atualizarTudo() {
+
+    const pedidosFiltrados =
+        obterPedidosFiltrados(pedidos);
+
+    const clusters =
+        criarClusters(pedidosFiltrados);
+
+    atualizarDashboard(pedidosFiltrados);
+
+    atualizarResumoMapa(
+        pedidosFiltrados,
+        clusters
+    );
+
+    atualizarInsights(
+        pedidosFiltrados,
+        clusters
+    );
+
+    desenharPedidos(clusters);
+
+}
+
+// ==========================================
+// Sliders
+// ==========================================
+
+function ligarSlider(idSlider, idTexto, sufixo) {
+
+    const slider =
+        document.getElementById(idSlider);
+
+    const texto =
+        document.getElementById(idTexto);
+
+    if (!slider || !texto)
+        return;
+
+    function atualizar() {
+
+        texto.innerText =
+            slider.value + sufixo;
+
+        if (mapa)
+            atualizarTudo();
+
+    }
+
+    texto.innerText =
+        slider.value + sufixo;
+
+    slider.addEventListener(
+        "input",
+        atualizar
+    );
+
+}
+
+ligarSlider(
+    "capacidade",
+    "valorCapacidade",
+    " lugares"
+);
+
+ligarSlider(
+    "tempoViatura",
+    "valorTempo",
+    " minutos"
+);
+
+ligarSlider(
+    "pickupKm",
+    "valorPickup",
+    " km"
+);
+
+ligarSlider(
+    "dropoffKm",
+    "valorDropoff",
+    " km"
+);
+
+ligarSlider(
+    "valorMinimo",
+    "valorMensal",
+    " €"
+);
+
+// ==========================================
+// Eventos
+// ==========================================
+
 document
     .getElementById("shared")
     .addEventListener("change", atualizarTudo);
@@ -163,3 +234,13 @@ document
 document
     .getElementById("private")
     .addEventListener("change", atualizarTudo);
+
+// ==========================================
+// Arranque
+// ==========================================
+
+iniciarMapa();
+
+carregarPedidos();
+
+console.log("App.js carregado");
