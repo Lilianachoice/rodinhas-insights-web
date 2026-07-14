@@ -181,16 +181,14 @@ function atualizarTudo() {
 // Apenas pedidos com localização válida
 const pedidosMapa = pedidosFiltrados.filter(p => {
 
-    const lat = Number(p.Latitude);
-    const lng = Number(p.Longitude);
+    const lat = Number(p["Pickup Lat"]);
+    const lng = Number(p["Pickup Lng"]);
 
     return (
         !isNaN(lat) &&
         !isNaN(lng) &&
         lat !== 0 &&
-        lng !== 0 &&
-        p["Pickup Cidade"] &&
-        p["Pickup Cidade"].trim() !== ""
+        lng !== 0
     );
 
 });
