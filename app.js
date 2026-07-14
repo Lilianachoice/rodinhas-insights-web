@@ -301,4 +301,38 @@ iniciarMapa();
 
 carregarPedidos();
 
+// ==========================================
+// ABAS
+// ==========================================
+
+const abaOperacao =
+    document.getElementById("abaOperacao");
+
+const abaExpansao =
+    document.getElementById("abaExpansao");
+
+abaOperacao.addEventListener("click", ()=>{
+
+    document.getElementById("paginaOperacao").style.display="block";
+
+    document.getElementById("paginaExpansao").style.display="none";
+
+    abaOperacao.classList.add("ativa");
+
+    abaExpansao.classList.remove("ativa");
+
+});
+
+abaExpansao.addEventListener("click", ()=>{
+
+    document.getElementById("paginaOperacao").style.display="none";
+
+    document.getElementById("paginaExpansao").style.display="block";
+
+    abaOperacao.classList.remove("ativa");
+
+    abaExpansao.classList.add("ativa");
+
+});
+
 console.log("App.js carregado");
