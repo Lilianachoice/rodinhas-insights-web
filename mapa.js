@@ -428,3 +428,115 @@ function mostrarCluster(id) {
 }
 
 console.log("Mapa.js carregado");
+function mostrarDetalheCluster(cluster){
+
+    let html = `
+
+        <div class="clusterHeader">
+
+            <div>
+
+                <div class="clusterTitulo">
+
+                    ${cluster.pedidos[0]["Pickup Cidade"] || "Sem cidade"}
+
+                </div>
+
+            </div>
+
+            <div class="clusterReceita">
+
+                ${cluster.receita.toLocaleString("pt-PT")} €
+
+            </div>
+
+        </div>
+
+        <div class="clusterInfo">
+
+            <div class="infoBox">
+
+                <div class="infoTitulo">
+                    Pedidos
+                </div>
+
+                <div class="infoValor">
+                    ${cluster.pedidos.length}
+                </div>
+
+            </div>
+
+            <div class="infoBox">
+
+                <div class="infoTitulo">
+                    Shared
+                </div>
+
+                <div class="infoValor">
+                    ${cluster.shared}
+                </div>
+
+            </div>
+
+            <div class="infoBox">
+
+                <div class="infoTitulo">
+                    Private
+                </div>
+
+                <div class="infoValor">
+                    ${cluster.private}
+                </div>
+
+            </div>
+
+        </div>
+
+        <table class="tabelaPedidos">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Tipo</th>
+
+                    <th>Mensalidade</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+    `;
+
+    cluster.pedidos.forEach(pedido=>{
+
+        html += `
+
+            <tr>
+
+                <td>${pedido.ID}</td>
+
+                <td>${pedido["Transport Type"]}</td>
+
+                <td>${Number(pedido["Monthly Fee"]||0).toLocaleString("pt-PT")} €</td>
+
+            </tr>
+
+        `;
+
+    });
+
+    html += `
+
+            </tbody>
+
+        </table>
+
+    `;
+
+    document.getElementById("detalheCluster").innerHTML = html;
+
+}
