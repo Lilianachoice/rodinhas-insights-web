@@ -780,3 +780,216 @@ Nenhuma oportunidade encontrada.
     border-bottom:1px solid #f1f1f1;
 
 }
+/* =======================================================
+   DETALHE DO CLUSTER
+=======================================================*/
+
+.clusterDetalhe{
+
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:30px;
+
+    min-height:250px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+
+}
+
+.clusterVazio{
+
+    text-align:center;
+
+    padding:70px;
+
+    color:#999;
+
+    font-size:18px;
+
+}
+
+.clusterHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    margin-bottom:25px;
+
+}
+
+.clusterTitulo{
+
+    font-size:28px;
+
+    font-weight:700;
+
+}
+
+.clusterSubtitulo{
+
+    color:#777;
+
+    margin-top:6px;
+
+}
+
+.clusterReceita{
+
+    font-size:32px;
+
+    font-weight:700;
+
+    color:#2E7D32;
+
+}
+
+.clusterInfo{
+
+    display:flex;
+
+    gap:18px;
+
+    margin-bottom:30px;
+
+    flex-wrap:wrap;
+
+}
+
+.infoBox{
+
+    background:#F8F8F8;
+
+    border-radius:14px;
+
+    padding:18px 22px;
+
+    min-width:150px;
+
+}
+
+.infoTitulo{
+
+    font-size:13px;
+
+    color:#777;
+
+}
+
+.infoValor{
+
+    margin-top:6px;
+
+    font-size:26px;
+
+    font-weight:700;
+
+}
+
+.tabelaPedidos{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:10px;
+
+}
+
+.tabelaPedidos thead{
+
+    background:#F6F6F6;
+
+}
+
+.tabelaPedidos th{
+
+    padding:14px;
+
+    text-align:left;
+
+    font-weight:600;
+
+}
+
+.tabelaPedidos td{
+
+    padding:14px;
+
+    border-bottom:1px solid #EEE;
+
+}
+
+.tipoShared{
+
+    display:inline-block;
+
+    background:#F4C400;
+
+    color:#000;
+
+    border-radius:20px;
+
+    padding:4px 12px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+.tipoPrivate{
+
+    display:inline-block;
+
+    background:#444;
+
+    color:white;
+
+    border-radius:20px;
+
+    padding:4px 12px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+.clusterAcao{
+
+    margin-top:25px;
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+.botaoCluster{
+
+    background:#F4C400;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:12px 20px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.botaoCluster:hover{
+
+    transform:translateY(-2px);
+
+}
