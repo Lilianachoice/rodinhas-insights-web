@@ -175,11 +175,20 @@ function atualizarInsights(listaPedidos, clusters) {
 
 function atualizarTudo() {
 
-    const pedidosFiltrados =
-    obterPedidosFiltrados(pedidos);
+const pedidos2026 =
+    obterPedidosFiltrados(pedidos).filter(p => {
+
+        const data = p["Start Date"];
+
+        if (!data)
+            return false;
+
+        return String(data).includes("2026");
+
+    });
 
 // Apenas pedidos com localização válida
-const pedidosMapa = pedidosFiltrados.filter(p => {
+const pedidosMapa = pedidos2026.filter(p => {
 
     const lat = Number(p["Pickup Lat"]);
     const lng = Number(p["Pickup Lng"]);
@@ -194,7 +203,7 @@ const pedidosMapa = pedidosFiltrados.filter(p => {
 });
 
 // Guardamos estes para a futura janela de expansão
-const pedidosExpansao = pedidosFiltrados.filter(p => !pedidosMapa.includes(p));
+const pedidosExpansao = pedidos2026.filter(p => !pedidosMapa.includes(p));
 
 clustersAtuais =
     criarClusters(pedidosMapa);
@@ -220,7 +229,7 @@ desenharPedidos(
     clusters
 );
 const oportunidades =
-    obterOportunidadesExpansao(pedidosFiltrados);
+    obterOportunidadesExpansao(pedidos2026);
 
 atualizarTabelaExpansao(oportunidades);
     
