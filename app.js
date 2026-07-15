@@ -336,3 +336,97 @@ abaExpansao.addEventListener("click", ()=>{
 });
 
 console.log("App.js carregado");
+// ==========================================
+// OPORTUNIDADES DE EXPANSÃO
+// ==========================================
+
+function obterOportunidadesExpansao(listaPedidos) {
+
+    const grupos = {};
+
+    listaPedidos.forEach(p => {
+
+        // Apenas pedidos sem localização
+        const lat = Number(p["Pickup Lat"]);
+
+        if (!isNaN(lat) && lat !== 0)
+            return;
+
+        const cpCompleto = (p["Pickup CP"] || "").trim();
+
+        if (!cpCompleto)
+            return;
+
+        const cp = cpCompleto.substring(0,4);
+
+        if (!grupos[cp]) {
+
+            grupos[cp] = {
+
+                cp,
+
+                cidade: p["Pickup Cidade"] || "-",
+
+                pedidos: 0,
+
+                shared: 0,
+
+                private: 0,
+
+                passageiros: 0
+
+            };
+
+        }
+
+        grupos[cp].pedidos++;
+
+        if (p["Transport Type"] === "Shared")
+            grupos[cp].shared++;
+
+        else if (p["Transport Type"] === "Private")
+            grupos[cp].private++;
+
+        grupos[cp].passageiros +=
+            Number(p["Total Passengers"]) || 0;
+
+    });
+
+    return Object.values(grupos)
+        .sort((a,b)=>b.pedidos-a.pedidos);
+
+}
+
+function atualizarTabelaExpansao(lista){
+
+    const tbody =
+        document.getElementById("tabelaExpansao");
+
+    if(!tbody)
+        return;
+
+    tbody.innerHTML="";
+
+    lista.forEach(linha=>{
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${linha.cp}</td>
+
+                <td>${linha.cidade}</td>
+
+                <td>${linha.pedidos}</td>
+
+                <td>${linha.shared}</td>
+
+                <td>${linha.private}</td>
+
+                <td>${linha.passageiros}</td>
+
+            </tr>
+        `;
+
+    });
+
+}
