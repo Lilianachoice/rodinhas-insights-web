@@ -1040,3 +1040,54 @@ Nenhuma oportunidade encontrada.
     background:white;
 
 }
+/* ===========================
+   Potencial Expansão
+=========================== */
+
+.expansao{
+
+    padding:30px;
+
+}
+
+.tabelaExpansao{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+}
+
+.tabelaExpansao th{
+
+    background:#0b5ed7;
+
+    color:white;
+
+    padding:12px;
+
+    text-align:left;
+
+}
+
+.tabelaExpansao td{
+
+    padding:12px;
+
+    border-bottom:1px solid #ececec;
+
+}
+
+.tabelaExpansao tr:hover{
+
+    background:#f6f9ff;
+
+    cursor:pointer;
+
+}
