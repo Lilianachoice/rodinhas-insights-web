@@ -219,7 +219,11 @@ atualizarInsights(
 desenharPedidos(
     clusters
 );
+const oportunidades =
+    obterOportunidadesExpansao(pedidosFiltrados);
 
+atualizarTabelaExpansao(oportunidades);
+    
 // Apenas para já, para confirmar que a separação funciona
 console.log(
     "Mapa:",
