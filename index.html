@@ -49,6 +49,7 @@
     </div>
 
 </header>
+
 <!-- ========================= -->
 <!-- ABAS -->
 <!-- ========================= -->
@@ -80,6 +81,11 @@
     </button>
 
 </div>
+
+<!-- ===================================================== -->
+<!-- OPERAÇÃO ATUAL -->
+<!-- ===================================================== -->
+
 <div id="paginaOperacao">
 
 <main>
@@ -351,8 +357,32 @@
 
 </main>
 
+<!-- ========================= -->
+<!-- DETALHE DO CLUSTER -->
+<!-- ========================= -->
+
+<section class="bottom">
+
+    <h2>Detalhe do Cluster</h2>
+
+    <div id="detalheCluster" class="clusterDetalhe">
+
+        <div class="clusterVazio">
+
+            Selecione um cluster no mapa ou clique na Melhor Oportunidade para visualizar todos os pedidos.
+
+        </div>
+
+    </div>
+
+</section>
+
 </div>
-    
+
+<!-- ===================================================== -->
+<!-- POTENCIAL DE EXPANSÃO -->
+<!-- ===================================================== -->
+
 <div id="paginaExpansao" style="display:none;">
 
     <section class="expansao">
@@ -365,21 +395,15 @@
 
                 <tr>
 
-    <th>Score</th>
+                    <th>Score</th>
+                    <th>CP</th>
+                    <th>Localidade</th>
+                    <th>Pedidos</th>
+                    <th>Shared</th>
+                    <th>Private</th>
+                    <th>Passageiros</th>
 
-    <th>CP</th>
-
-    <th>Localidade</th>
-
-    <th>Pedidos</th>
-
-    <th>Shared</th>
-
-    <th>Private</th>
-
-    <th>Passageiros</th>
-
-</tr>
+                </tr>
 
             </thead>
 
@@ -393,7 +417,11 @@
 
 </div>
 
-    <div id="paginaIndices" style="display:none;">
+<!-- ===================================================== -->
+<!-- CONFIGURAÇÃO DOS ÍNDICES -->
+<!-- ===================================================== -->
+
+<div id="paginaIndices" style="display:none;">
 
     <section class="configIndices">
 
@@ -438,25 +466,6 @@
     </section>
 
 </div>
-<!-- ========================= -->
-<!-- DETALHE DO CLUSTER -->
-<!-- ========================= -->
-
-<section class="bottom">
-
-    <h2>Detalhe do Cluster</h2>
-
-    <div id="detalheCluster" class="clusterDetalhe">
-
-        <div class="clusterVazio">
-
-            Selecione um cluster no mapa ou clique na Melhor Oportunidade para visualizar todos os pedidos.
-
-        </div>
-
-    </div>
-
-</section>
 
 <!-- Leaflet -->
 
