@@ -439,25 +439,29 @@ function atualizarTabelaExpansao(lista){
     if(!tbody)
         return;
 
-    tbody.innerHTML += `
-    <tr>
+    tbody.innerHTML = "";
 
-        <td><strong>${linha.score}</strong></td>
+    lista.forEach(linha => {
 
-        <td>${linha.cp}</td>
+        tbody.innerHTML += `
+            <tr>
 
-        <td>${linha.cidade}</td>
+                <td><strong>${linha.score}</strong></td>
 
-        <td>${linha.pedidos}</td>
+                <td>${linha.cp}</td>
 
-        <td>${linha.shared}</td>
+                <td>${linha.cidade}</td>
 
-        <td>${linha.private}</td>
+                <td>${linha.pedidos}</td>
 
-        <td>${linha.passageiros}</td>
+                <td>${linha.shared}</td>
 
-    </tr>
-`;
+                <td>${linha.private}</td>
+
+                <td>${linha.passageiros}</td>
+
+            </tr>
+        `;
 
     });
 
