@@ -389,19 +389,21 @@ function obterOportunidadesExpansao(listaPedidos) {
 
             grupos[cp] = {
 
-                cp,
+    cp,
 
-                cidade: p["Pickup Cidade"] || "-",
+    cidade: p["Pickup Cidade"] || "-",
 
-                pedidos: 0,
+    pedidos: 0,
 
-                shared: 0,
+    shared: 0,
 
-                private: 0,
+    private: 0,
 
-                passageiros: 0
+    passageiros: 0,
 
-            };
+    score: 0
+
+};
 
         }
 
@@ -415,11 +417,17 @@ function obterOportunidadesExpansao(listaPedidos) {
 
         grupos[cp].passageiros +=
             Number(p["Total Passengers"]) || 0;
+    
+        grupos[cp].score =
+        grupos[cp].pedidos * 10 +
+        grupos[cp].shared * 5 +
+        grupos[cp].passageiros * 2 -
+        grupos[cp].private * 3;
 
     });
 
     return Object.values(grupos)
-        .sort((a,b)=>b.pedidos-a.pedidos);
+    .sort((a,b)=>b.score-a.score);
 
 }
 
