@@ -30,11 +30,9 @@ async function carregarPedidos() {
 
         const response = await fetch(API_URL);
 
-        console.log("Status:", response.status);
+        pedidos = await response.json();
 
-        const texto = await response.text();
-
-        console.log(texto.substring(0,500));
+        atualizarTudo();
 
     }
     catch (erro) {
