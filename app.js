@@ -168,7 +168,26 @@ function atualizarInsights(listaPedidos, clusters) {
     }
 
 }
+// ==========================================
+// FILTRO POR ANO
+// ==========================================
 
+function filtrarAno(listaPedidos, ano) {
+
+    return listaPedidos.filter(p => {
+
+        const data =
+            p["Start Date"] ||
+            p["Data Pedido"];
+
+        if (!data)
+            return false;
+
+        return String(data).includes(ano);
+
+    });
+
+}
 // ==========================================
 // Atualizar tudo
 // ==========================================
@@ -176,16 +195,10 @@ function atualizarInsights(listaPedidos, clusters) {
 function atualizarTudo() {
 
 const pedidos2026 =
-    obterPedidosFiltrados(pedidos).filter(p => {
-
-        const data = p["Start Date"];
-
-        if (!data)
-            return false;
-
-        return String(data).includes("2026");
-
-    });
+    filtrarAno(
+        obterPedidosFiltrados(pedidos),
+        "2026"
+    );
 
 // Apenas pedidos com localização válida
 const pedidosMapa = pedidos2026.filter(p => {
