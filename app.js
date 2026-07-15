@@ -337,15 +337,22 @@ const abaOperacao =
 const abaExpansao =
     document.getElementById("abaExpansao");
 
+const abaIndices =
+    document.getElementById("abaIndices");
+
 abaOperacao.addEventListener("click", ()=>{
 
     document.getElementById("paginaOperacao").style.display="block";
 
     document.getElementById("paginaExpansao").style.display="none";
 
+    document.getElementById("paginaIndices").style.display="none";
+
     abaOperacao.classList.add("ativa");
 
     abaExpansao.classList.remove("ativa");
+
+    abaIndices.classList.remove("ativa");
 
 });
 
@@ -355,9 +362,28 @@ abaExpansao.addEventListener("click", ()=>{
 
     document.getElementById("paginaExpansao").style.display="block";
 
+    document.getElementById("paginaIndices").style.display="none";
+
     abaOperacao.classList.remove("ativa");
 
     abaExpansao.classList.add("ativa");
+
+    abaIndices.classList.remove("ativa");
+
+});
+abaIndices.addEventListener("click", ()=>{
+
+    document.getElementById("paginaOperacao").style.display="none";
+
+    document.getElementById("paginaExpansao").style.display="none";
+
+    document.getElementById("paginaIndices").style.display="block";
+
+    abaOperacao.classList.remove("ativa");
+
+    abaExpansao.classList.remove("ativa");
+
+    abaIndices.classList.add("ativa");
 
 });
 
