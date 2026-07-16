@@ -248,8 +248,7 @@ function popularSelect(idSelect, valores, textoTodos) {
 // ==========================================
 
 // Extrai o período de serviço (Start Date / End Date) como objetos
-// Date reais, para se poder testar sobreposição com uma janela de
-// filtro. Devolve null nos campos que não conseguir interpretar.
+// Date reais. Devolve null nos campos que não conseguir interpretar.
 function obterPeriodoPedido(pedido) {
 
     const inicioTexto = pedido["Start Date"];
@@ -265,60 +264,10 @@ function obterPeriodoPedido(pedido) {
 
 }
 
-// Calcula a janela de datas [inicio, fim] a aplicar, a partir dos
-// selects #ano e #mes. Devolve null se for para mostrar tudo (sem
-// filtro de datas).
-function obterJanelaDatas() {
-
-    const anoEl = document.getElementById("ano");
-    const mesEl = document.getElementById("mes");
-
-    const ano = anoEl ? anoEl.value : "";
-    const mes = mesEl ? mesEl.value : "";
-
-    const hoje = new Date();
-
-    // "Mês atual + 2 seguintes": janela sempre relativa a hoje,
-    // independente do ano selecionado (é uma janela "a andar")
-    if (mes === "atual3") {
-
-        return {
-            inicio: new Date(hoje.getFullYear(), hoje.getMonth(), 1),
-            fim: new Date(hoje.getFullYear(), hoje.getMonth() + 3, 0, 23, 59, 59)
-        };
-
-    }
-
-    // Mês específico (combinado com o ano selecionado, ou o ano
-    // atual se "Todos" estiver escolhido no Ano)
-    if (mes) {
-
-        const anoAlvo = ano ? Number(ano) : hoje.getFullYear();
-        const mesIndice = Number(mes) - 1;
-
-        return {
-            inicio: new Date(anoAlvo, mesIndice, 1),
-            fim: new Date(anoAlvo, mesIndice + 1, 0, 23, 59, 59)
-        };
-
-    }
-
-    // Sem mês específico, mas com ano selecionado: janela = ano inteiro
-    if (ano) {
-
-        const anoAlvo = Number(ano);
-
-        return {
-            inicio: new Date(anoAlvo, 0, 1),
-            fim: new Date(anoAlvo, 11, 31, 23, 59, 59)
-        };
-
-    }
-
-    // "Todos" em ambos -> sem filtro de datas
-    return null;
-
-}
+// Estado dos dois filtros de mês (Início / Fim do serviço).
+// Um Set vazio significa "Todos" (sem restrição nesse filtro).
+window.filtroMesesInicio = new Set();
+window.filtroMesesFim = new Set();
 
 function obterPedidosFiltrados(listaPedidos) {
 
@@ -344,7 +293,8 @@ function obterPedidosFiltrados(listaPedidos) {
         document.getElementById("ano") ?
             document.getElementById("ano").value : "";
 
-    const janela = obterJanelaDatas();
+    const mesesInicio = window.filtroMesesInicio || new Set();
+    const mesesFim = window.filtroMesesFim || new Set();
 
     return listaPedidos.filter(p => {
 
@@ -379,28 +329,26 @@ function obterPedidosFiltrados(listaPedidos) {
 
         }
 
-        // Ano + Mês, com sobreposição de período de serviço
-        // (Start Date / End Date) — um serviço que começou antes e
-        // acaba depois da janela continua a aparecer
-        if (janela) {
+        // Ano (aplicado sobre a data do pedido / início de serviço)
+        if (ano && obterAno(p) !== ano)
+            return false;
 
-            const periodo = obterPeriodoPedido(p);
+        const periodo = obterPeriodoPedido(p);
 
-            if (periodo.inicio && periodo.fim) {
+        // Mês de Início de Serviço — só filtra quem tem essa data;
+        // pedidos sem Start Date não são escondidos por causa disto
+        if (mesesInicio.size && periodo.inicio) {
 
-                if (periodo.fim < janela.inicio || periodo.inicio > janela.fim)
-                    return false;
+            if (!mesesInicio.has(periodo.inicio.getMonth() + 1))
+                return false;
 
-            }
-            else {
+        }
 
-                // Sem datas de serviço utilizáveis: cai para o ano
-                // da Data Pedido, para não esconder pedidos sem
-                // Start/End Date só porque não têm essas colunas
-                if (ano && obterAno(p) !== ano)
-                    return false;
+        // Mês de Fim de Serviço — mesma lógica, sobre End Date
+        if (mesesFim.size && periodo.fim) {
 
-            }
+            if (!mesesFim.has(periodo.fim.getMonth() + 1))
+                return false;
 
         }
 
