@@ -361,11 +361,24 @@ document.querySelectorAll(".iaBotaoExpansao").forEach(botao => {
 // Arranque
 // ==========================================
 
-iniciarMapa();
+async function iniciar() {
 
-carregarPedidos();
+    iniciarMapa();
 
-iniciarPaginaIndices();
+    // A configuração partilhada (pesos, regras, turnos, depósitos, email)
+    // tem de estar disponível antes de calcular scores e rotas
+    await carregarConfigPartilhada();
+
+    iniciarPaginaIndices();
+
+    await carregarPedidos();
+
+    if (typeof atualizarPaginaRotas === "function")
+        atualizarPaginaRotas();
+
+}
+
+iniciar();
 
 // ==========================================
 // ABAS
@@ -377,19 +390,22 @@ const abaOperacao =
 const abaExpansao =
     document.getElementById("abaExpansao");
 
+const abaRotas =
+    document.getElementById("abaRotas");
+
 const abaIndices =
     document.getElementById("abaIndices");
 
 function trocarAba(paginaAtiva, abaAtiva) {
 
-    ["paginaOperacao", "paginaExpansao", "paginaIndices"].forEach(id => {
+    ["paginaOperacao", "paginaExpansao", "paginaRotas", "paginaIndices"].forEach(id => {
 
         document.getElementById(id).style.display =
             id === paginaAtiva ? "block" : "none";
 
     });
 
-    [abaOperacao, abaExpansao, abaIndices].forEach(aba => {
+    [abaOperacao, abaExpansao, abaRotas, abaIndices].forEach(aba => {
 
         aba.classList.toggle("ativa", aba === abaAtiva);
 
@@ -400,6 +416,9 @@ function trocarAba(paginaAtiva, abaAtiva) {
     if (paginaAtiva === "paginaOperacao" && mapa)
         setTimeout(() => mapa.invalidateSize(), 50);
 
+    if (paginaAtiva === "paginaRotas" && typeof atualizarPaginaRotas === "function")
+        atualizarPaginaRotas();
+
 }
 
 abaOperacao.addEventListener("click", () =>
@@ -407,6 +426,9 @@ abaOperacao.addEventListener("click", () =>
 
 abaExpansao.addEventListener("click", () =>
     trocarAba("paginaExpansao", abaExpansao));
+
+abaRotas.addEventListener("click", () =>
+    trocarAba("paginaRotas", abaRotas));
 
 abaIndices.addEventListener("click", () =>
     trocarAba("paginaIndices", abaIndices));
