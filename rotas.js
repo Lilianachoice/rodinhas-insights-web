@@ -222,11 +222,15 @@ function construirRotasPotenciaisSite() {
 
         pontuarClustersRotas(clusters, config.pesosOperacao);
 
-        clusters.sort((a, b) => b.score - a.score);
+        const criterio = config.criterioRota || { ativo: false, minPedidos: 3 };
 
-        // Mostra todos os clusters formados (sem mínimo de pedidos
-        // nem de score), até ao nº de viaturas disponíveis no depósito
-        resultado[chave] = clusters.slice(0, config.depositos[chave].viaturas);
+        const candidatos = criterio.ativo
+            ? clusters.filter(c => c.pedidos.length >= criterio.minPedidos)
+            : clusters;
+
+        candidatos.sort((a, b) => b.score - a.score);
+
+        resultado[chave] = candidatos.slice(0, config.depositos[chave].viaturas);
 
     });
 
