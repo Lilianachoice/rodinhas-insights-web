@@ -1136,7 +1136,7 @@ Nenhuma oportunidade encontrada.
 
 .cartoesIndices{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
     gap:25px;
     align-items:start;
 }
@@ -1267,4 +1267,101 @@ Nenhuma oportunidade encontrada.
         grid-template-columns:1fr 1fr;
     }
 
+}
+
+/* ===========================
+   POTENCIAIS ROTAS
+=========================== */
+
+.depositosGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin:20px 0 25px;
+}
+
+.depositoCard{
+    background:white;
+    border-radius:16px;
+    padding:22px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    border-left:5px solid #0b5ed7;
+}
+
+.depositoNome{
+    font-size:18px;
+    font-weight:700;
+}
+
+.depositoMorada{
+    color:#777;
+    font-size:13px;
+    margin:4px 0 10px;
+}
+
+.depositoInfo{
+    font-size:14px;
+    margin-bottom:4px;
+}
+
+.depositoTurno{
+    font-size:13px;
+    color:#888;
+}
+
+.rotaCard{
+    background:white;
+    border-radius:14px;
+    padding:18px 22px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    margin-bottom:14px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.rotaCard:hover{
+    transform:translateY(-2px);
+}
+
+.rotaHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.rotaTitulo{
+    font-size:18px;
+    font-weight:700;
+}
+
+.rotaSubtitulo{
+    color:#777;
+    font-size:13px;
+    margin-top:2px;
+}
+
+.rotaStats{
+    margin-top:10px;
+    font-size:13px;
+    color:#444;
+}
+
+@media (max-width:1000px){
+
+    .depositosGrid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+/* Inputs de texto/hora/número dentro da Configuração dos Índices
+   (turno, viaturas, email) */
+.linhaSlider input[type="time"],
+.linhaSlider input[type="number"],
+.linhaSlider input[type="text"]{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:8px 12px;
+    font-family:Poppins,sans-serif;
+    font-size:14px;
 }
