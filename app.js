@@ -56,7 +56,12 @@ async function carregarPedidos() {
         // Preenche Zona / Localidade / Ano a partir dos dados reais
         popularListasDinamicas(pedidos);
 
+        // Valores por omissão: ano atual + "mês atual + 2 seguintes"
+        definirFiltrosDataPorOmissao();
+
         atualizarTudo();
+
+        atualizarInfoFiltroData();
 
     }
     catch (erro) {
@@ -390,14 +395,85 @@ ligarSlider("valorMinimo", "valorMensal", " €");
 // Eventos — filtros
 // ==========================================
 
-["shared", "private", "zona", "cidade", "dias", "ano"].forEach(id => {
+["shared", "private", "zona", "cidade", "dias", "ano", "mes"].forEach(id => {
 
     const el = document.getElementById(id);
 
     if (el)
-        el.addEventListener("change", atualizarTudo);
+        el.addEventListener("change", () => {
+
+            atualizarTudo();
+
+            atualizarInfoFiltroData();
+
+            if (typeof atualizarPaginaRotas === "function")
+                atualizarPaginaRotas();
+
+        });
 
 });
+
+// ==========================================
+// Filtros de data — valores por omissão e texto informativo
+// ==========================================
+
+function definirFiltrosDataPorOmissao() {
+
+    const anoEl = document.getElementById("ano");
+    const mesEl = document.getElementById("mes");
+
+    const anoAtual = String(new Date().getFullYear());
+
+    // Só define o valor por omissão se a opção existir na lista
+    // (populada a partir dos dados reais)
+    if (anoEl && [...anoEl.options].some(o => o.value === anoAtual))
+        anoEl.value = anoAtual;
+
+    if (mesEl)
+        mesEl.value = "atual3";
+
+}
+
+const NOMES_MESES = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+];
+
+function atualizarInfoFiltroData() {
+
+    const info = document.getElementById("filtroDataInfo");
+
+    if (!info)
+        return;
+
+    const janela = typeof obterJanelaDatas === "function" ? obterJanelaDatas() : null;
+
+    if (!janela) {
+
+        info.innerText = "A mostrar todo o histórico";
+        return;
+
+    }
+
+    const formatar = data => `${NOMES_MESES[data.getMonth()]} ${data.getFullYear()}`;
+
+    if (formatar(janela.inicio) === formatar(janela.fim))
+        info.innerText = `A mostrar: ${formatar(janela.inicio)}`;
+    else
+        info.innerText = `A mostrar: ${formatar(janela.inicio)} — ${formatar(janela.fim)}`;
+
+}
+
+// Esconde a barra de filtros de data na página de Configuração
+// (não faz sentido lá — não filtra nenhuma tabela)
+function atualizarVisibilidadeBarraFiltrosData(paginaAtiva) {
+
+    const barra = document.getElementById("barraFiltrosData");
+
+    if (barra)
+        barra.style.display = paginaAtiva === "paginaIndices" ? "none" : "flex";
+
+}
 
 // Clique no cartão "Melhor oportunidade"
 document
@@ -517,6 +593,8 @@ const abaIndices =
 
 function trocarAba(paginaAtiva, abaAtiva) {
 
+    atualizarVisibilidadeBarraFiltrosData(paginaAtiva);
+
     ["paginaOperacao", "paginaExpansao", "paginaRotas", "paginaIndices"].forEach(id => {
 
         document.getElementById(id).style.display =
@@ -590,22 +668,23 @@ function obterOportunidadesExpansao(listaPedidos) {
         // função rebentar ao chamar .trim() diretamente num número.
         const cpCompleto = String(p["Pickup CP"] || "").trim();
 
-        if (!cpValido(cpCompleto))
-            return;
-
-        const cp = cpCompleto.substring(0, 4);
+        // Sem CP válido -> não desaparece, entra num grupo "catch-all"
+        // (não pode ser localizado num mapa, mas continua a contar
+        // nos totais e na lista de pedidos por analisar)
+        const cp = cpValido(cpCompleto) ? cpCompleto.substring(0, 4) : "SEM_CP";
 
         if (!grupos[cp]) {
 
             grupos[cp] = {
 
-                cp,
-                cidade: p["Pickup Cidade"] || "-",
+                cp: cp === "SEM_CP" ? "—" : cp,
+                cidade: cp === "SEM_CP" ? "Sem localização identificada" : (p["Pickup Cidade"] || "-"),
                 pedidos: 0,
                 shared: 0,
                 private: 0,
                 passageiros: 0,
                 score: 0,
+                semLocalizacao: cp === "SEM_CP",
                 listaPedidos: []
 
             };
