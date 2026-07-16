@@ -194,7 +194,7 @@
 
         <select id="zona">
 
-            <option>Todas</option>
+            <option value="">Todas</option>
 
         </select>
 
@@ -206,7 +206,7 @@
 
         <select id="cidade">
 
-            <option>Todas</option>
+            <option value="">Todas</option>
 
         </select>
 
@@ -218,12 +218,24 @@
 
         <select id="dias">
 
-            <option>Todos</option>
-            <option>Monday</option>
-            <option>Tuesday</option>
-            <option>Wednesday</option>
-            <option>Thursday</option>
-            <option>Friday</option>
+            <option value="Todos">Todos</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+
+        </select>
+
+    </div>
+
+    <div class="param">
+
+        <label>Ano</label>
+
+        <select id="ano">
+
+            <option value="">Todos</option>
 
         </select>
 
@@ -331,7 +343,7 @@
 
     </div>
 
-    <div class="insightCard">
+    <div class="insightCard" id="insightMelhor" style="cursor:pointer;">
 
         <div class="icone">🏆</div>
 
@@ -343,13 +355,41 @@
 
             </div>
 
-            <div id="insightMelhor" class="valorInsight">
+            <div id="insightMelhorValor" class="valorInsight">
 
                 --
 
             </div>
 
         </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- IA — OPERAÇÃO ATUAL -->
+    <!-- ========================= -->
+
+    <div class="iaBox">
+
+        <h3>🤖 Pergunta à IA</h3>
+
+        <div class="iaPerguntas">
+
+            <button class="iaBotao" data-pergunta="reforcar">
+                Em que zona compensa reforçar a operação?
+            </button>
+
+            <button class="iaBotao" data-pergunta="horario">
+                Qual o horário mais crítico?
+            </button>
+
+            <button class="iaBotao" data-pergunta="viaturas">
+                Quantas viaturas seriam necessárias?
+            </button>
+
+        </div>
+
+        <div id="iaOperacaoResposta" class="iaResposta" style="display:none;"></div>
 
     </div>
 
@@ -389,6 +429,66 @@
 
         <h2>🌍 Potencial de Expansão</h2>
 
+        <!-- Estatísticas -->
+
+        <div class="expansaoStats">
+
+            <div class="expStatCard">
+
+                <div class="expStatTitulo">Locais analisados</div>
+                <div id="expLocais" class="expStatValor">--</div>
+
+            </div>
+
+            <div class="expStatCard">
+
+                <div class="expStatTitulo">Pedidos</div>
+                <div id="expPedidos" class="expStatValor">--</div>
+
+            </div>
+
+            <div class="expStatCard">
+
+                <div class="expStatTitulo">Passageiros</div>
+                <div id="expPassageiros" class="expStatValor">--</div>
+
+            </div>
+
+            <div class="expStatCard">
+
+                <div class="expStatTitulo">Score médio</div>
+                <div id="expScoreMedio" class="expStatValor">--</div>
+
+            </div>
+
+        </div>
+
+        <!-- IA — Expansão -->
+
+        <div class="iaBox iaBoxExpansao">
+
+            <h3>🤖 Pergunta à IA</h3>
+
+            <div class="iaPerguntas">
+
+                <button class="iaBotaoExpansao" data-pergunta="nova-zona">
+                    Onde abrir uma nova operação?
+                </button>
+
+                <button class="iaBotaoExpansao" data-pergunta="franchising">
+                    Onde abrir um franchising?
+                </button>
+
+                <button class="iaBotaoExpansao" data-pergunta="cp">
+                    Que CP tem maior concentração de pedidos?
+                </button>
+
+            </div>
+
+            <div id="iaExpansaoResposta" class="iaResposta" style="display:none;"></div>
+
+        </div>
+
         <table class="tabelaExpansao">
 
             <thead>
@@ -413,6 +513,8 @@
 
         </table>
 
+        <div id="detalheExpansao" class="clusterDetalhe" style="display:none;"></div>
+
     </section>
 
 </div>
@@ -427,39 +529,49 @@
 
         <h2>⚙️ Configuração dos Índices de Oportunidade</h2>
 
-        <div class="cartaoIndice">
+        <div class="cartoesIndices">
 
-            <h3>🚐 Operação Atual</h3>
+            <div class="cartaoIndice">
 
-            <p>
+                <h3>🚐 Operação Atual</h3>
 
-                Defina os critérios utilizados para calcular o Índice de Oportunidade da Operação Atual.
+                <p class="descIndice">
 
-            </p>
+                    Define o peso de cada critério no Índice de Oportunidade
+                    usado no mapa e no cartão "Melhor Oportunidade".
 
-            <button id="editarIndiceOperacao">
+                </p>
 
-                Editar critérios
+                <div id="slidersOperacao" class="listaSliders"></div>
 
-            </button>
+                <button id="guardarPesosOperacao" class="botaoGuardar">
+                    Guardar
+                </button>
 
-        </div>
+                <span id="confirmacaoOperacao" class="confirmacaoGuardar"></span>
 
-        <div class="cartaoIndice">
+            </div>
 
-            <h3>🌍 Potencial de Expansão</h3>
+            <div class="cartaoIndice">
 
-            <p>
+                <h3>🌍 Potencial de Expansão</h3>
 
-                Defina os critérios utilizados para calcular o Índice de Oportunidade do Potencial de Expansão.
+                <p class="descIndice">
 
-            </p>
+                    Define o peso de cada critério no Índice de Oportunidade
+                    usado na tabela de Potencial de Expansão.
 
-            <button id="editarIndiceExpansao">
+                </p>
 
-                Editar critérios
+                <div id="slidersExpansao" class="listaSliders"></div>
 
-            </button>
+                <button id="guardarPesosExpansao" class="botaoGuardar">
+                    Guardar
+                </button>
+
+                <span id="confirmacaoExpansao" class="confirmacaoGuardar"></span>
+
+            </div>
 
         </div>
 
@@ -475,6 +587,8 @@
 
 <script src="mapa.js"></script>
 <script src="clusters.js"></script>
+<script src="ia.js"></script>
+<script src="indices.js"></script>
 <script src="app.js"></script>
 
 </body>
