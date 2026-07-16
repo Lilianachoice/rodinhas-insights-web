@@ -365,16 +365,35 @@ async function iniciar() {
 
     iniciarMapa();
 
-    // A configuração partilhada (pesos, regras, turnos, depósitos, email)
-    // tem de estar disponível antes de calcular scores e rotas
+    // A configuração partilhada nunca deve impedir o resto do site de
+    // arrancar — se falhar ou vier mal formada, cai para valores por
+    // omissão (ver indices.js) em vez de travar aqui.
     await carregarConfigPartilhada();
 
-    iniciarPaginaIndices();
+    try {
+
+        iniciarPaginaIndices();
+
+    }
+    catch (erro) {
+
+        console.error("Erro ao iniciar a página de Configuração dos Índices:", erro);
+
+    }
 
     await carregarPedidos();
 
-    if (typeof atualizarPaginaRotas === "function")
-        atualizarPaginaRotas();
+    try {
+
+        if (typeof atualizarPaginaRotas === "function")
+            atualizarPaginaRotas();
+
+    }
+    catch (erro) {
+
+        console.error("Erro ao construir a página de Potenciais Rotas:", erro);
+
+    }
 
 }
 
@@ -416,8 +435,20 @@ function trocarAba(paginaAtiva, abaAtiva) {
     if (paginaAtiva === "paginaOperacao" && mapa)
         setTimeout(() => mapa.invalidateSize(), 50);
 
-    if (paginaAtiva === "paginaRotas" && typeof atualizarPaginaRotas === "function")
-        atualizarPaginaRotas();
+    if (paginaAtiva === "paginaRotas" && typeof atualizarPaginaRotas === "function") {
+
+        try {
+
+            atualizarPaginaRotas();
+
+        }
+        catch (erro) {
+
+            console.error("Erro ao atualizar a página de Potenciais Rotas:", erro);
+
+        }
+
+    }
 
 }
 
