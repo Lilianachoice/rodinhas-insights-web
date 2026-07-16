@@ -1400,3 +1400,63 @@ Nenhuma oportunidade encontrada.
     cursor:pointer;
     text-decoration:underline;
 }
+
+/* ===========================
+   BARRA DE FILTROS DE DATA
+   (Ano + Mês, partilhada entre
+   Operação Atual, Potencial de
+   Expansão e Potenciais Rotas)
+=========================== */
+
+.barraFiltrosData{
+    display:flex;
+    align-items:center;
+    gap:24px;
+    background:white;
+    border-radius:16px;
+    padding:14px 22px;
+    margin:20px 30px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    flex-wrap:wrap;
+}
+
+.filtroDataItem{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.filtroDataItem label{
+    font-size:13px;
+    font-weight:600;
+    color:#555;
+}
+
+.filtroDataItem select{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:7px 12px;
+    font-family:Poppins,sans-serif;
+    font-size:14px;
+    background:#f9fafc;
+}
+
+.filtroDataInfo{
+    margin-left:auto;
+    font-size:13px;
+    color:#0b5ed7;
+    font-weight:600;
+}
+
+@media (max-width:800px){
+
+    .barraFiltrosData{
+        margin:0 0 16px;
+    }
+
+    .filtroDataInfo{
+        margin-left:0;
+        width:100%;
+    }
+
+}
