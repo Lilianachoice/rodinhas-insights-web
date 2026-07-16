@@ -11,6 +11,9 @@ let pedidos = [];
 // Guarda o melhor cluster encontrado
 let melhorCluster = null;
 
+// Guarda a lista de oportunidades de expansão atual (para a IA e cliques na tabela)
+let oportunidadesAtuais = [];
+
 console.log("Leaflet:", typeof L);
 
 // ==========================================
@@ -19,6 +22,24 @@ console.log("Leaflet:", typeof L);
 
 document.getElementById("ultimaAtualizacao").innerHTML =
     new Date().toLocaleString("pt-PT");
+
+// ==========================================
+// DEBOUNCE (performance)
+// ==========================================
+
+function debounce(fn, atraso) {
+
+    let temporizador = null;
+
+    return function (...args) {
+
+        clearTimeout(temporizador);
+
+        temporizador = setTimeout(() => fn(...args), atraso);
+
+    };
+
+}
 
 // ==========================================
 // Carregar pedidos
@@ -32,6 +53,9 @@ async function carregarPedidos() {
 
         pedidos = await response.json();
 
+        // Preenche Zona / Localidade / Ano a partir dos dados reais
+        popularListasDinamicas(pedidos);
+
         atualizarTudo();
 
     }
@@ -39,38 +63,10 @@ async function carregarPedidos() {
 
         console.error(erro);
 
+        document.getElementById("textoResumo").innerText =
+            "Não foi possível carregar os pedidos. Verifica a ligação à API.";
+
     }
-
-}
-
-// ==========================================
-// Dashboard (mantido por compatibilidade)
-// ==========================================
-
-function atualizarDashboard(listaPedidos) {
-
-    const receita = listaPedidos.reduce(
-
-        (total, pedido) =>
-            total + (Number(pedido["Monthly Fee"]) || 0),
-
-        0
-
-    );
-
-    const pedidosEl = document.getElementById("pedidos");
-    const receitaEl = document.getElementById("receita");
-    const oportunidadesEl = document.getElementById("oportunidades");
-
-    if (pedidosEl)
-        pedidosEl.innerText = listaPedidos.length;
-
-    if (receitaEl)
-        receitaEl.innerText =
-            receita.toLocaleString("pt-PT") + " €";
-
-    if (oportunidadesEl)
-        oportunidadesEl.innerText = "...";
 
 }
 
@@ -103,8 +99,26 @@ function atualizarResumoMapa(listaPedidos, clusters) {
     );
 
     filtros.push(
+        `Dropoff ≤ ${document.getElementById("dropoffKm").value} km`
+    );
+
+    filtros.push(
+        `Lotação ≤ ${document.getElementById("capacidade").value}`
+    );
+
+    filtros.push(
         `Valor ≥ ${document.getElementById("valorMinimo").value} €`
     );
+
+    const zona = document.getElementById("zona").value;
+    const cidade = document.getElementById("cidade").value;
+    const dias = document.getElementById("dias").value;
+    const ano = document.getElementById("ano").value;
+
+    if (zona) filtros.push(`Zona: ${zona}`);
+    if (cidade) filtros.push(`Localidade: ${cidade}`);
+    if (dias && dias !== "Todos") filtros.push(`Dia: ${dias}`);
+    if (ano) filtros.push(`Ano: ${ano}`);
 
     document.getElementById("textoFiltros").innerText =
         "Filtros ativos: " + filtros.join(" • ");
@@ -132,10 +146,24 @@ function atualizarInsights(listaPedidos, clusters) {
     document.getElementById("insightReceita").innerText =
         receita.toLocaleString("pt-PT") + " €";
 
-    document.getElementById("insightViaturas").innerText =
-        "--";
+    // Viaturas necessárias: soma, por cluster, das viaturas
+    // necessárias para cobrir os passageiros desse cluster
+    const capacidade =
+        Number(document.getElementById("capacidade").value) || 7;
 
-    // Procurar melhor cluster
+    const viaturas = clusters.reduce(
+
+        (total, cluster) =>
+            total + Math.ceil((cluster.totalPassageiros || cluster.pedidos.length) / capacidade),
+
+        0
+
+    );
+
+    document.getElementById("insightViaturas").innerText =
+        clusters.length ? viaturas : "--";
+
+    // Melhor cluster = maior Índice de Oportunidade
     melhorCluster = null;
 
     clusters.forEach(cluster => {
@@ -143,118 +171,81 @@ function atualizarInsights(listaPedidos, clusters) {
         if (!melhorCluster)
             melhorCluster = cluster;
 
-        else if (cluster.receita > melhorCluster.receita)
+        else if ((cluster.score || 0) > (melhorCluster.score || 0))
             melhorCluster = cluster;
 
     });
+
+    const elMelhor = document.getElementById("insightMelhorValor");
 
     if (melhorCluster) {
 
         const cidade =
             melhorCluster.pedidos[0]["Pickup Cidade"] || "Sem cidade";
 
-        document.getElementById("insightMelhor").innerHTML =
+        elMelhor.innerHTML =
             `
             ${cidade}<br>
-            ${melhorCluster.pedidos.length} pedidos<br>
-            ${melhorCluster.receita.toLocaleString("pt-PT")} €
+            ${melhorCluster.pedidos.length} pedidos • Índice ${melhorCluster.score}
             `;
 
     }
     else {
 
-        document.getElementById("insightMelhor").innerHTML = "--";
+        elMelhor.innerHTML = "--";
 
     }
 
 }
-// ==========================================
-// FILTRO POR ANO
-// ==========================================
 
-function filtrarAno(listaPedidos, ano) {
-
-    return listaPedidos.filter(p => {
-
-        const data =
-            p["Start Date"] ||
-            p["Data Pedido"];
-
-        if (!data)
-            return false;
-
-        return String(data).includes(ano);
-
-    });
-
-}
 // ==========================================
 // Atualizar tudo
 // ==========================================
 
 function atualizarTudo() {
 
-const pedidos2026 =
-    filtrarAno(
-        obterPedidosFiltrados(pedidos),
-        "2026"
+    const pedidosFiltrados =
+        obterPedidosFiltrados(pedidos);
+
+    // Apenas pedidos com localização válida (dentro de Portugal)
+    const pedidosMapa = pedidosFiltrados.filter(pedidoTemPickupValido);
+
+    // Todos os restantes (sem coordenadas válidas) alimentam
+    // a página de Potencial de Expansão
+    const pedidosExpansao = pedidosFiltrados.filter(p => !pedidoTemPickupValido(p));
+
+    const clusters = criarClusters(pedidosMapa);
+
+    atualizarResumoMapa(
+        pedidosMapa,
+        clusters
     );
 
-// Apenas pedidos com localização válida
-const pedidosMapa = pedidos2026.filter(p => {
-
-    const lat = Number(p["Pickup Lat"]);
-    const lng = Number(p["Pickup Lng"]);
-
-    return (
-        !isNaN(lat) &&
-        !isNaN(lng) &&
-        lat !== 0 &&
-        lng !== 0
+    atualizarInsights(
+        pedidosMapa,
+        clusters
     );
 
-});
+    desenharPedidos(
+        clusters
+    );
 
-// Guardamos estes para a futura janela de expansão
-const pedidosExpansao = pedidos2026.filter(p => !pedidosMapa.includes(p));
+    oportunidadesAtuais =
+        obterOportunidadesExpansao(pedidosExpansao);
 
-clustersAtuais =
-    criarClusters(pedidosMapa);
+    atualizarTabelaExpansao(oportunidadesAtuais);
+    atualizarStatsExpansao(oportunidadesAtuais);
 
-const clusters =
-    clustersAtuais;
-
-atualizarDashboard(
-    pedidosMapa
-);
-
-atualizarResumoMapa(
-    pedidosMapa,
-    clusters
-);
-
-atualizarInsights(
-    pedidosMapa,
-    clusters
-);
-
-desenharPedidos(
-    clusters
-);
-const oportunidades =
-    obterOportunidadesExpansao(pedidos2026);
-
-atualizarTabelaExpansao(oportunidades);
-    
-// Apenas para já, para confirmar que a separação funciona
-console.log(
-    "Mapa:",
-    pedidosMapa.length,
-    "| Expansão:",
-    pedidosExpansao.length
-);
+    console.log(
+        "Mapa:",
+        pedidosMapa.length,
+        "| Expansão:",
+        pedidosExpansao.length
+    );
 
 }
+
+const atualizarTudoComDebounce = debounce(atualizarTudo, 200);
 
 // ==========================================
 // Sliders
@@ -271,23 +262,21 @@ function ligarSlider(idSlider, idTexto, sufixo) {
     if (!slider || !texto)
         return;
 
-    function atualizar() {
+    function atualizarTexto() {
 
         texto.innerText =
             slider.value + sufixo;
 
-        if (mapa)
-            atualizarTudo();
-
     }
 
-    texto.innerText =
-        slider.value + sufixo;
+    atualizarTexto();
 
-    slider.addEventListener(
-        "input",
-        atualizar
-    );
+    slider.addEventListener("input", () => {
+
+        atualizarTexto();
+        atualizarTudoComDebounce();
+
+    });
 
 }
 
@@ -298,16 +287,17 @@ ligarSlider("dropoffKm", "valorDropoff", " km");
 ligarSlider("valorMinimo", "valorMensal", " €");
 
 // ==========================================
-// Eventos
+// Eventos — filtros
 // ==========================================
 
-document
-    .getElementById("shared")
-    .addEventListener("change", atualizarTudo);
+["shared", "private", "zona", "cidade", "dias", "ano"].forEach(id => {
 
-document
-    .getElementById("private")
-    .addEventListener("change", atualizarTudo);
+    const el = document.getElementById(id);
+
+    if (el)
+        el.addEventListener("change", atualizarTudo);
+
+});
 
 // Clique no cartão "Melhor oportunidade"
 document
@@ -320,12 +310,62 @@ document
     });
 
 // ==========================================
+// IA — Operação Atual
+// ==========================================
+
+document.querySelectorAll(".iaBotao").forEach(botao => {
+
+    botao.addEventListener("click", () => {
+
+        const capacidade =
+            Number(document.getElementById("capacidade").value) || 7;
+
+        const resposta = responderIaOperacao(
+            botao.dataset.pergunta,
+            clustersAtuais,
+            capacidade
+        );
+
+        const caixa = document.getElementById("iaOperacaoResposta");
+
+        caixa.style.display = "block";
+        caixa.innerHTML = resposta;
+
+    });
+
+});
+
+// ==========================================
+// IA — Potencial de Expansão
+// ==========================================
+
+document.querySelectorAll(".iaBotaoExpansao").forEach(botao => {
+
+    botao.addEventListener("click", () => {
+
+        const resposta = responderIaExpansao(
+            botao.dataset.pergunta,
+            oportunidadesAtuais
+        );
+
+        const caixa = document.getElementById("iaExpansaoResposta");
+
+        caixa.style.display = "block";
+        caixa.innerHTML = resposta;
+
+    });
+
+});
+
+// ==========================================
 // Arranque
 // ==========================================
 
 iniciarMapa();
 
 carregarPedidos();
+
+iniciarPaginaIndices();
 
 // ==========================================
 // ABAS
@@ -340,54 +380,39 @@ const abaExpansao =
 const abaIndices =
     document.getElementById("abaIndices");
 
-abaOperacao.addEventListener("click", ()=>{
+function trocarAba(paginaAtiva, abaAtiva) {
 
-    document.getElementById("paginaOperacao").style.display="block";
+    ["paginaOperacao", "paginaExpansao", "paginaIndices"].forEach(id => {
 
-    document.getElementById("paginaExpansao").style.display="none";
+        document.getElementById(id).style.display =
+            id === paginaAtiva ? "block" : "none";
 
-    document.getElementById("paginaIndices").style.display="none";
+    });
 
-    abaOperacao.classList.add("ativa");
+    [abaOperacao, abaExpansao, abaIndices].forEach(aba => {
 
-    abaExpansao.classList.remove("ativa");
+        aba.classList.toggle("ativa", aba === abaAtiva);
 
-    abaIndices.classList.remove("ativa");
+    });
 
-});
+    // O mapa do Leaflet precisa de recalcular o tamanho
+    // quando a aba volta a ficar visível
+    if (paginaAtiva === "paginaOperacao" && mapa)
+        setTimeout(() => mapa.invalidateSize(), 50);
 
-abaExpansao.addEventListener("click", ()=>{
+}
 
-    document.getElementById("paginaOperacao").style.display="none";
+abaOperacao.addEventListener("click", () =>
+    trocarAba("paginaOperacao", abaOperacao));
 
-    document.getElementById("paginaExpansao").style.display="block";
+abaExpansao.addEventListener("click", () =>
+    trocarAba("paginaExpansao", abaExpansao));
 
-    document.getElementById("paginaIndices").style.display="none";
-
-    abaOperacao.classList.remove("ativa");
-
-    abaExpansao.classList.add("ativa");
-
-    abaIndices.classList.remove("ativa");
-
-});
-abaIndices.addEventListener("click", ()=>{
-
-    document.getElementById("paginaOperacao").style.display="none";
-
-    document.getElementById("paginaExpansao").style.display="none";
-
-    document.getElementById("paginaIndices").style.display="block";
-
-    abaOperacao.classList.remove("ativa");
-
-    abaExpansao.classList.remove("ativa");
-
-    abaIndices.classList.add("ativa");
-
-});
+abaIndices.addEventListener("click", () =>
+    trocarAba("paginaIndices", abaIndices));
 
 console.log("App.js carregado");
+
 // ==========================================
 // OPORTUNIDADES DE EXPANSÃO
 // ==========================================
@@ -398,42 +423,32 @@ function obterOportunidadesExpansao(listaPedidos) {
 
     listaPedidos.forEach(p => {
 
-        // Apenas pedidos sem localização
-        const lat = Number(p["Pickup Lat"]);
-
-        if (!isNaN(lat) && lat !== 0)
-            return;
-
         const cpCompleto = (p["Pickup CP"] || "").trim();
 
         if (!cpCompleto)
             return;
 
-        const cp = cpCompleto.substring(0,4);
+        const cp = cpCompleto.substring(0, 4);
 
         if (!grupos[cp]) {
 
             grupos[cp] = {
 
-    cp,
+                cp,
+                cidade: p["Pickup Cidade"] || "-",
+                pedidos: 0,
+                shared: 0,
+                private: 0,
+                passageiros: 0,
+                score: 0,
+                listaPedidos: []
 
-    cidade: p["Pickup Cidade"] || "-",
-
-    pedidos: 0,
-
-    shared: 0,
-
-    private: 0,
-
-    passageiros: 0,
-
-    score: 0
-
-};
+            };
 
         }
 
         grupos[cp].pedidos++;
+        grupos[cp].listaPedidos.push(p);
 
         if (p["Transport Type"] === "Shared")
             grupos[cp].shared++;
@@ -443,52 +458,163 @@ function obterOportunidadesExpansao(listaPedidos) {
 
         grupos[cp].passageiros +=
             Number(p["Total Passengers"]) || 0;
-    
-        grupos[cp].score =
-        grupos[cp].pedidos * 10 +
-        grupos[cp].shared * 5 +
-        grupos[cp].passageiros * 2 -
-        grupos[cp].private * 3;
 
     });
 
-    return Object.values(grupos)
-    .sort((a,b)=>b.score-a.score);
+    const lista = Object.values(grupos);
+
+    const pesos = obterPesosExpansao();
+
+    const maxPedidos = Math.max(...lista.map(g => g.pedidos), 1);
+    const maxPassageiros = Math.max(...lista.map(g => g.passageiros), 1);
+
+    lista.forEach(grupo => {
+
+        const metricaPedidos = grupo.pedidos / maxPedidos;
+        const metricaPassageiros = grupo.passageiros / maxPassageiros;
+        const metricaShared = grupo.pedidos ? grupo.shared / grupo.pedidos : 0;
+        const metricaPrivate = grupo.pedidos ? grupo.private / grupo.pedidos : 0;
+
+        const score =
+            metricaPedidos * pesos.pedidos +
+            metricaPassageiros * pesos.passageiros +
+            metricaShared * pesos.shared +
+            metricaPrivate * pesos.private;
+
+        grupo.score = Math.max(0, Math.min(100, Math.round(score)));
+
+    });
+
+    return lista.sort((a, b) => b.score - a.score);
 
 }
 
-function atualizarTabelaExpansao(lista){
+function atualizarTabelaExpansao(lista) {
 
     const tbody =
         document.getElementById("tabelaExpansao");
 
-    if(!tbody)
+    if (!tbody)
         return;
 
     tbody.innerHTML = "";
 
-    lista.forEach(linha => {
+    lista.forEach((linha, indice) => {
 
-        tbody.innerHTML += `
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+
+            <td><strong>${linha.score}</strong></td>
+            <td>${linha.cp}</td>
+            <td>${linha.cidade}</td>
+            <td>${linha.pedidos}</td>
+            <td>${linha.shared}</td>
+            <td>${linha.private}</td>
+            <td>${linha.passageiros}</td>
+
+        `;
+
+        tr.addEventListener("click", () => mostrarPedidosExpansao(indice));
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+function mostrarPedidosExpansao(indice) {
+
+    const grupo = oportunidadesAtuais[indice];
+
+    const painel = document.getElementById("detalheExpansao");
+
+    if (!grupo || !painel)
+        return;
+
+    let html = `
+
+        <div class="clusterHeader">
+
+            <div>
+
+                <div class="clusterTitulo">CP ${grupo.cp} — ${grupo.cidade}</div>
+                <div class="clusterSubtitulo">Índice de Oportunidade: ${grupo.score}</div>
+
+            </div>
+
+        </div>
+
+        <table class="tabelaPedidos">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Passageiros</th>
+                    <th>Mensalidade</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+    `;
+
+    grupo.listaPedidos.forEach(p => {
+
+        const tipo =
+            p["Transport Type"] === "Shared"
+                ? '<span class="tipoShared">Shared</span>'
+                : '<span class="tipoPrivate">Private</span>';
+
+        html += `
+
             <tr>
 
-                <td><strong>${linha.score}</strong></td>
-
-                <td>${linha.cp}</td>
-
-                <td>${linha.cidade}</td>
-
-                <td>${linha.pedidos}</td>
-
-                <td>${linha.shared}</td>
-
-                <td>${linha.private}</td>
-
-                <td>${linha.passageiros}</td>
+                <td>${p["ID"] || "-"}</td>
+                <td>${tipo}</td>
+                <td>${p["Total Passengers"] || "-"}</td>
+                <td>${(Number(p["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €</td>
 
             </tr>
+
         `;
 
     });
+
+    html += `</tbody></table>`;
+
+    painel.style.display = "block";
+    painel.innerHTML = html;
+
+    painel.scrollIntoView({ behavior: "smooth" });
+
+}
+
+function atualizarStatsExpansao(lista) {
+
+    const locais = lista.length;
+    const pedidosTotal = lista.reduce((s, g) => s + g.pedidos, 0);
+    const passageirosTotal = lista.reduce((s, g) => s + g.passageiros, 0);
+    const scoreMedio = locais
+        ? Math.round(lista.reduce((s, g) => s + g.score, 0) / locais)
+        : 0;
+
+    const set = (id, valor) => {
+
+        const el = document.getElementById(id);
+
+        if (el) el.innerText = valor;
+
+    };
+
+    set("expLocais", locais);
+    set("expPedidos", pedidosTotal);
+    set("expPassageiros", passageirosTotal);
+    set("expScoreMedio", locais ? scoreMedio : "--");
 
 }
