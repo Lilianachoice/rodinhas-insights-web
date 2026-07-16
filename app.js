@@ -207,12 +207,16 @@ function atualizarTudo() {
     const pedidosFiltrados =
         obterPedidosFiltrados(pedidos);
 
-    // Apenas pedidos com localização válida (dentro de Portugal)
-    const pedidosMapa = pedidosFiltrados.filter(pedidoTemPickupValido);
+    // Operação Atual = tem morada (dentro da área de atuação),
+    // mesmo que ainda não tenha coordenadas exatas.
+    // Potencial de Expansão = não tem morada nenhuma (fora da área).
+    const pedidosOperacao = pedidosFiltrados.filter(pedidoTemMorada);
+    const pedidosExpansao = pedidosFiltrados.filter(p => !pedidoTemMorada(p));
 
-    // Todos os restantes (sem coordenadas válidas) alimentam
-    // a página de Potencial de Expansão
-    const pedidosExpansao = pedidosFiltrados.filter(p => !pedidoTemPickupValido(p));
+    // Dentro da Operação Atual, só quem já tem coordenadas válidas
+    // é que aparece no mapa e entra nos clusters
+    const pedidosMapa = pedidosOperacao.filter(pedidoTemPickupValido);
+    const pedidosPendentes = pedidosOperacao.filter(p => !pedidoTemPickupValido(p));
 
     const clusters = criarClusters(pedidosMapa);
 
@@ -221,8 +225,10 @@ function atualizarTudo() {
         clusters
     );
 
+    atualizarNotaPendentes(pedidosPendentes);
+
     atualizarInsights(
-        pedidosMapa,
+        pedidosOperacao,
         clusters
     );
 
@@ -237,15 +243,109 @@ function atualizarTudo() {
     atualizarStatsExpansao(oportunidadesAtuais);
 
     console.log(
-        "Mapa:",
-        pedidosMapa.length,
-        "| Expansão:",
-        pedidosExpansao.length
+        "Operação Atual:", pedidosOperacao.length,
+        "(mapa:", pedidosMapa.length, "/ pendentes de geocoding:", pedidosPendentes.length, ")",
+        "| Expansão:", pedidosExpansao.length
     );
 
 }
 
 const atualizarTudoComDebounce = debounce(atualizarTudo, 200);
+
+// ==========================================
+// Nota: pedidos com morada mas ainda sem coordenadas
+// ==========================================
+
+let pedidosPendentesAtuais = [];
+
+function atualizarNotaPendentes(lista) {
+
+    pedidosPendentesAtuais = lista;
+
+    let nota = document.getElementById("notaPendentes");
+
+    if (!nota) {
+
+        nota = document.createElement("div");
+        nota.id = "notaPendentes";
+        nota.className = "notaPendentes";
+
+        const resumo = document.querySelector(".resumoMapa");
+
+        if (resumo)
+            resumo.appendChild(nota);
+
+    }
+
+    if (!lista.length) {
+
+        nota.style.display = "none";
+        return;
+
+    }
+
+    nota.style.display = "block";
+
+    nota.innerHTML =
+        `⏳ +${lista.length} pedido(s) desta operação com morada mas ainda sem coordenadas exatas ` +
+        `(geocoding pendente) — não aparecem no mapa. <span class="notaPendentesLink" onclick="mostrarPedidosPendentes()">Ver lista</span>`;
+
+}
+
+function mostrarPedidosPendentes() {
+
+    const painel = document.getElementById("detalheCluster");
+
+    if (!painel || !pedidosPendentesAtuais.length)
+        return;
+
+    let html = `
+        <div class="clusterHeader">
+            <div>
+                <div class="clusterTitulo">Pendentes de geocodificação</div>
+                <div class="clusterSubtitulo">${pedidosPendentesAtuais.length} pedidos com morada, ainda sem coordenadas exatas</div>
+            </div>
+        </div>
+
+        <table class="tabelaPedidos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo</th>
+                    <th>Morada Pickup</th>
+                    <th>Mensalidade</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    pedidosPendentesAtuais.forEach(p => {
+
+        const tipo =
+            p["Transport Type"] === "Shared"
+                ? '<span class="tipoShared">Shared</span>'
+                : '<span class="tipoPrivate">Private</span>';
+
+        const morada = [p["Pickup"], p["Pickup CP"], p["Pickup Cidade"]]
+            .filter(Boolean).join(", ") || "—";
+
+        html += `
+            <tr>
+                <td>${p["ID"] || "-"}</td>
+                <td>${tipo}</td>
+                <td>${morada}</td>
+                <td>${(Number(p["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €</td>
+            </tr>
+        `;
+
+    });
+
+    html += `</tbody></table>`;
+
+    painel.innerHTML = html;
+    painel.scrollIntoView({ behavior: "smooth" });
+
+}
 
 // ==========================================
 // Sliders
