@@ -184,7 +184,14 @@ function construirRotasPotenciaisSite() {
 
     const config = window.configPartilhada;
 
-    const pedidosValidos = pedidos.filter(pedidoTemPickupValido);
+    // Aplica os mesmos filtros da Operação Atual (incluindo a janela
+    // de datas Ano/Mês) — assim as Potenciais Rotas refletem sempre
+    // o mesmo período que se está a analisar nas outras páginas
+    const pedidosComFiltros = obterPedidosFiltrados(pedidos);
+
+    const pedidosValidos = pedidosComFiltros
+        .filter(pedidoTemMorada)
+        .filter(pedidoTemPickupValido);
 
     const porDeposito = { porto: [], lisboa: [] };
 
