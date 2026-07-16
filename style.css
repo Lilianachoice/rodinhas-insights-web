@@ -1382,3 +1382,21 @@ Nenhuma oportunidade encontrada.
     width:100%;
     box-sizing:border-box;
 }
+
+/* Nota de pedidos com morada mas sem coordenadas ainda */
+.notaPendentes{
+    margin-top:8px;
+    padding:8px 14px;
+    background:#FFF8DB;
+    border-left:4px solid #F4C400;
+    border-radius:8px;
+    font-size:13px;
+    color:#665500;
+}
+
+.notaPendentesLink{
+    color:#0b5ed7;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:underline;
+}
