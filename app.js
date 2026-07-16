@@ -473,6 +473,15 @@ function construirDropdownMeses(idBotao, idPainel, estadoRef) {
 
     atualizarBotaoMeses(botao, estadoRef.set);
 
+    // Sem isto, chamar esta função mais do que uma vez para o mesmo
+    // botão (acontece ao arrancar + quando os pedidos carregam) colava
+    // um 2º listener de clique, e cada clique abria e fechava o painel
+    // no mesmo instante (parecia que "não fazia nada")
+    if (botao.dataset.dropdownLigado)
+        return;
+
+    botao.dataset.dropdownLigado = "1";
+
     botao.addEventListener("click", (evento) => {
 
         evento.stopPropagation();
