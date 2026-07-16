@@ -247,6 +247,79 @@ function popularSelect(idSelect, valores, textoTodos) {
 // FILTROS
 // ==========================================
 
+// Extrai o período de serviço (Start Date / End Date) como objetos
+// Date reais, para se poder testar sobreposição com uma janela de
+// filtro. Devolve null nos campos que não conseguir interpretar.
+function obterPeriodoPedido(pedido) {
+
+    const inicioTexto = pedido["Start Date"];
+    const fimTexto = pedido["End Date"];
+
+    const inicio = inicioTexto ? new Date(inicioTexto) : null;
+    const fim = fimTexto ? new Date(fimTexto) : null;
+
+    return {
+        inicio: (inicio && !isNaN(inicio.getTime())) ? inicio : null,
+        fim: (fim && !isNaN(fim.getTime())) ? fim : null
+    };
+
+}
+
+// Calcula a janela de datas [inicio, fim] a aplicar, a partir dos
+// selects #ano e #mes. Devolve null se for para mostrar tudo (sem
+// filtro de datas).
+function obterJanelaDatas() {
+
+    const anoEl = document.getElementById("ano");
+    const mesEl = document.getElementById("mes");
+
+    const ano = anoEl ? anoEl.value : "";
+    const mes = mesEl ? mesEl.value : "";
+
+    const hoje = new Date();
+
+    // "Mês atual + 2 seguintes": janela sempre relativa a hoje,
+    // independente do ano selecionado (é uma janela "a andar")
+    if (mes === "atual3") {
+
+        return {
+            inicio: new Date(hoje.getFullYear(), hoje.getMonth(), 1),
+            fim: new Date(hoje.getFullYear(), hoje.getMonth() + 3, 0, 23, 59, 59)
+        };
+
+    }
+
+    // Mês específico (combinado com o ano selecionado, ou o ano
+    // atual se "Todos" estiver escolhido no Ano)
+    if (mes) {
+
+        const anoAlvo = ano ? Number(ano) : hoje.getFullYear();
+        const mesIndice = Number(mes) - 1;
+
+        return {
+            inicio: new Date(anoAlvo, mesIndice, 1),
+            fim: new Date(anoAlvo, mesIndice + 1, 0, 23, 59, 59)
+        };
+
+    }
+
+    // Sem mês específico, mas com ano selecionado: janela = ano inteiro
+    if (ano) {
+
+        const anoAlvo = Number(ano);
+
+        return {
+            inicio: new Date(anoAlvo, 0, 1),
+            fim: new Date(anoAlvo, 11, 31, 23, 59, 59)
+        };
+
+    }
+
+    // "Todos" em ambos -> sem filtro de datas
+    return null;
+
+}
+
 function obterPedidosFiltrados(listaPedidos) {
 
     const usarShared =
@@ -270,6 +343,8 @@ function obterPedidosFiltrados(listaPedidos) {
     const ano =
         document.getElementById("ano") ?
             document.getElementById("ano").value : "";
+
+    const janela = obterJanelaDatas();
 
     return listaPedidos.filter(p => {
 
@@ -304,11 +379,28 @@ function obterPedidosFiltrados(listaPedidos) {
 
         }
 
-        // Ano
-        if (ano) {
+        // Ano + Mês, com sobreposição de período de serviço
+        // (Start Date / End Date) — um serviço que começou antes e
+        // acaba depois da janela continua a aparecer
+        if (janela) {
 
-            if (obterAno(p) !== ano)
-                return false;
+            const periodo = obterPeriodoPedido(p);
+
+            if (periodo.inicio && periodo.fim) {
+
+                if (periodo.fim < janela.inicio || periodo.inicio > janela.fim)
+                    return false;
+
+            }
+            else {
+
+                // Sem datas de serviço utilizáveis: cai para o ano
+                // da Data Pedido, para não esconder pedidos sem
+                // Start/End Date só porque não têm essas colunas
+                if (ano && obterAno(p) !== ano)
+                    return false;
+
+            }
 
         }
 
