@@ -229,7 +229,10 @@ const CONFIG_PARTILHADA_FALLBACK = {
 
     criterioRota: { minPedidos: 3, scoreMinimo: 50 },
 
-    emailDestino: ""
+    emailDestino: "",
+
+    // IDs de pedidos marcados manualmente como excluídos (ex: testes)
+    idsExcluidos: []
 
 };
 
@@ -352,10 +355,12 @@ function iniciarPaginaIndices() {
     construirSliders("slidersExpansao", METRICAS_EXPANSAO, obterPesosExpansao());
 
     preencherCamposRotas();
+    preencherCampoIdsExcluidos();
 
     const botaoOperacao = document.getElementById("guardarPesosOperacao");
     const botaoExpansao = document.getElementById("guardarPesosExpansao");
     const botaoRotas = document.getElementById("guardarConfigRotas");
+    const botaoExcluidos = document.getElementById("guardarIdsExcluidos");
 
     if (botaoOperacao) {
 
@@ -431,6 +436,46 @@ function iniciarPaginaIndices() {
         });
 
     }
+
+    if (botaoExcluidos) {
+
+        botaoExcluidos.addEventListener("click", async () => {
+
+            const texto = document.getElementById("idsExcluidos").value || "";
+
+            const ids = texto
+                .split(",")
+                .map(t => t.trim())
+                .filter(Boolean);
+
+            const ok = await guardarConfigPartilhadaNoBackend({ idsExcluidos: ids });
+
+            mostrarConfirmacao("confirmacaoExcluidos");
+
+            if (ok) {
+
+                if (typeof atualizarTudo === "function")
+                    atualizarTudo();
+
+                if (typeof atualizarPaginaRotas === "function")
+                    atualizarPaginaRotas();
+
+            }
+
+        });
+
+    }
+
+}
+
+function preencherCampoIdsExcluidos() {
+
+    const campo = document.getElementById("idsExcluidos");
+
+    if (!campo || !window.configPartilhada)
+        return;
+
+    campo.value = (window.configPartilhada.idsExcluidos || []).join(", ");
 
 }
 
