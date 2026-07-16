@@ -659,127 +659,6 @@ Nenhuma oportunidade encontrada.
     min-height:650px;
 
 }
-.clusterDetalhe{
-
-    background:#fff;
-
-    border-radius:20px;
-
-    padding:30px;
-
-    box-shadow:0 8px 25px rgba(0,0,0,.05);
-
-    min-height:220px;
-
-}
-
-.clusterVazio{
-
-    text-align:center;
-
-    color:#999;
-
-    font-size:18px;
-
-    padding:60px;
-
-}
-
-.clusterHeader{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:25px;
-
-}
-
-.clusterTitulo{
-
-    font-size:28px;
-
-    font-weight:700;
-
-}
-
-.clusterReceita{
-
-    font-size:28px;
-
-    font-weight:700;
-
-    color:#2E7D32;
-
-}
-
-.clusterInfo{
-
-    display:flex;
-
-    gap:25px;
-
-    margin-bottom:30px;
-
-    flex-wrap:wrap;
-
-}
-
-.infoBox{
-
-    background:#fafafa;
-
-    border-radius:14px;
-
-    padding:15px 20px;
-
-}
-
-.infoTitulo{
-
-    color:#888;
-
-    font-size:13px;
-
-}
-
-.infoValor{
-
-    font-size:22px;
-
-    font-weight:700;
-
-}
-
-.tabelaPedidos{
-
-    width:100%;
-
-    border-collapse:collapse;
-
-    margin-top:15px;
-
-}
-
-.tabelaPedidos th{
-
-    text-align:left;
-
-    padding:12px;
-
-    border-bottom:2px solid #eee;
-
-}
-
-.tabelaPedidos td{
-
-    padding:12px;
-
-    border-bottom:1px solid #f1f1f1;
-
-}
 /* =======================================================
    DETALHE DO CLUSTER
 =======================================================*/
@@ -1089,5 +968,303 @@ Nenhuma oportunidade encontrada.
     background:#f6f9ff;
 
     cursor:pointer;
+
+}
+/* ===========================
+   POPUP DO MAPA
+=========================== */
+
+.popupCluster{
+    min-width:200px;
+    font-size:13px;
+}
+
+.popupCidade{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+
+.popupTipo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    color:#555;
+    margin-bottom:6px;
+}
+
+.popupScore{
+    background:#0b5ed7;
+    color:white;
+    border-radius:20px;
+    padding:2px 10px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.popupNumero{
+    margin:6px 0;
+}
+
+.popupReceita{
+    margin-bottom:6px;
+}
+
+.popupLink{
+    color:#0b5ed7;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:6px;
+}
+
+.popupLink:hover{
+    text-decoration:underline;
+}
+
+.badgeScore{
+    display:inline-block;
+    background:#0b5ed7;
+    color:white;
+    border-radius:20px;
+    padding:2px 12px;
+    font-size:13px;
+    font-weight:700;
+    margin-left:8px;
+}
+
+.tabelaScrollWrapper{
+    overflow-x:auto;
+}
+
+/* ===========================
+   IA (Operação e Expansão)
+=========================== */
+
+.iaBox{
+    background:white;
+    border-radius:18px;
+    padding:22px;
+    margin-top:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+}
+
+.iaBoxExpansao{
+    margin-bottom:25px;
+    margin-top:0;
+}
+
+.iaBox h3{
+    font-size:16px;
+    margin-bottom:14px;
+}
+
+.iaPerguntas{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.iaBotao,
+.iaBotaoExpansao{
+    text-align:left;
+    background:#f5f7fb;
+    border:1px solid #e2e6ee;
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.iaBotao:hover,
+.iaBotaoExpansao:hover{
+    background:#eaf0ff;
+    border-color:#0b5ed7;
+}
+
+.iaResposta{
+    margin-top:16px;
+    background:#f5f7fb;
+    border-left:4px solid #0b5ed7;
+    border-radius:8px;
+    padding:14px 16px;
+    font-size:13px;
+    line-height:1.6;
+    color:#333;
+}
+
+/* ===========================
+   EXPANSÃO — Estatísticas
+=========================== */
+
+.expansaoStats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.expStatCard{
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    text-align:center;
+}
+
+.expStatTitulo{
+    font-size:13px;
+    color:#888;
+    margin-bottom:6px;
+}
+
+.expStatValor{
+    font-size:26px;
+    font-weight:700;
+    color:#0b5ed7;
+}
+
+/* ===========================
+   CONFIGURAÇÃO DOS ÍNDICES
+=========================== */
+
+.configIndices{
+    padding:30px;
+}
+
+.cartoesIndices{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+    align-items:start;
+}
+
+.cartaoIndice{
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+}
+
+.cartaoIndice h3{
+    font-size:20px;
+    margin-bottom:8px;
+}
+
+.descIndice{
+    color:#777;
+    font-size:13px;
+    margin-bottom:22px;
+}
+
+.listaSliders{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.linhaSlider{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.labelSlider{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.valorSliderMetrica{
+    margin-left:auto;
+    color:#0b5ed7;
+    font-weight:700;
+}
+
+.tooltipMetrica{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#e2e6ee;
+    color:#555;
+    font-size:11px;
+    font-weight:700;
+    cursor:help;
+    position:relative;
+}
+
+.tooltipMetrica:hover::after{
+    content:attr(data-tooltip);
+    position:absolute;
+    left:20px;
+    top:-8px;
+    width:240px;
+    background:#222;
+    color:white;
+    font-weight:400;
+    font-size:12px;
+    line-height:1.5;
+    padding:10px 12px;
+    border-radius:10px;
+    z-index:50;
+}
+
+.linhaSlider input[type="range"]{
+    width:100%;
+    appearance:none;
+    height:6px;
+    background:#E7E7E7;
+    border-radius:999px;
+    outline:none;
+}
+
+.linhaSlider input[type="range"]::-webkit-slider-thumb{
+    appearance:none;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#0b5ed7;
+    cursor:pointer;
+}
+
+.botaoGuardar{
+    margin-top:24px;
+    background:#0b5ed7;
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:12px 26px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.botaoGuardar:hover{
+    background:#094bb0;
+}
+
+.confirmacaoGuardar{
+    margin-left:14px;
+    color:#2E7D32;
+    font-weight:600;
+    font-size:13px;
+}
+
+@media (max-width:1000px){
+
+    .cartoesIndices{
+        grid-template-columns:1fr;
+    }
+
+    .expansaoStats{
+        grid-template-columns:1fr 1fr;
+    }
 
 }
