@@ -196,22 +196,94 @@ function mostrarConfirmacao(idSpan) {
 // Muda os dois valores juntos se quiseres uma chave só tua.
 const FRONTEND_KEY = "rodinhas-config-2026";
 
+// Usado sempre que a API ainda não tem o endpoint de configuração
+// (Apps Script antigo, ainda não publicado) ou devolve algo inesperado —
+// assim a página nunca fica presa/rebentada, mesmo que o backend
+// ainda não tenha sido atualizado.
+const CONFIG_PARTILHADA_FALLBACK = {
+
+    pesosOperacao: { ...PESOS_OPERACAO_DEFAULT },
+    pesosExpansao: { ...PESOS_EXPANSAO_DEFAULT },
+
+    regrasOperacionais: {
+        capacidade: 7, tempoViatura: 90, pickupKm: 10, dropoffKm: 10, valorMinimo: 0
+    },
+
+    turno: { inicio: "07:00", fim: "20:00" },
+
+    depositos: {
+
+        porto: {
+            nome: "Lake Towers",
+            morada: "Rua Daciano Baptista Marques 245, 4400-617 Vila Nova de Gaia",
+            lat: 41.132, lng: -8.633, viaturas: 1
+        },
+
+        lisboa: {
+            nome: "Prior Velho",
+            morada: "Prior Velho, 2685 Loures",
+            lat: 38.796, lng: -9.110, viaturas: 1
+        }
+
+    },
+
+    criterioRota: { minPedidos: 3, scoreMinimo: 50 },
+
+    emailDestino: ""
+
+};
+
+// Confirma que o objeto tem mesmo forma de configuração (e não,
+// por exemplo, a lista de pedidos — o que acontece se o Apps Script
+// ainda não tiver sido atualizado com o endpoint ?recurso=config)
+function pareceConfigValida(objeto) {
+
+    return !!(
+
+        objeto &&
+        typeof objeto === "object" &&
+        !Array.isArray(objeto) &&
+        objeto.turno &&
+        objeto.depositos &&
+        objeto.depositos.porto &&
+        objeto.depositos.lisboa
+
+    );
+
+}
+
 async function carregarConfigPartilhada() {
 
     try {
 
         const resposta = await fetch(API_URL + "?recurso=config");
 
-        window.configPartilhada = await resposta.json();
+        const dados = await resposta.json();
+
+        if (pareceConfigValida(dados)) {
+
+            window.configPartilhada = dados;
+
+        }
+        else {
+
+            console.warn(
+                "A API devolveu algo que não parece a configuração partilhada " +
+                "(o Apps Script pode ainda não ter o código novo publicado — " +
+                "config.gs / configStore.gs / web.gs / rotas.gs). " +
+                "A usar valores por omissão até isso ser corrigido."
+            );
+
+            window.configPartilhada = CONFIG_PARTILHADA_FALLBACK;
+
+        }
 
     }
     catch (erro) {
 
         console.error("Não foi possível carregar a configuração partilhada:", erro);
 
-        // Sem configuração partilhada, os pesos caem para localStorage/defaults
-        // (ver obterPesosOperacao/obterPesosExpansao em clusters.js)
-        window.configPartilhada = null;
+        window.configPartilhada = CONFIG_PARTILHADA_FALLBACK;
 
     }
 
