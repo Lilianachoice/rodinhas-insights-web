@@ -1365,3 +1365,20 @@ Nenhuma oportunidade encontrada.
     font-family:Poppins,sans-serif;
     font-size:14px;
 }
+
+/* Grid dos campos de Turnos/Depositos/Email, na página Potenciais Rotas */
+.linhasConfigRotas{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:20px;
+    margin-bottom:10px;
+}
+
+.linhaSliderLarga{
+    grid-column:1 / -1;
+}
+
+.linhasConfigRotas input[type="text"]{
+    width:100%;
+    box-sizing:border-box;
+}
