@@ -71,13 +71,26 @@ function pedidoTemPickupValido(pedido) {
 // coordenadas geocodificadas. Um pedido pode ter morada completa e
 // ainda assim não ter Lat/Lng (geocoding pendente ou falhado) — esse
 // continua a ser Operação Atual, só não aparece no mapa.
+function valorPreenchido(valor) {
+
+    const texto = String(valor || "").trim();
+
+    // A Sheet às vezes tem "-" como placeholder em vez de célula
+    // vazia — isso não conta como informação real
+    if (!texto || texto === "-" || texto === "--")
+        return false;
+
+    return true;
+
+}
+
 function pedidoTemMorada(pedido) {
 
-    const pickup = String(pedido["Pickup"] || "").trim();
-    const cp = String(pedido["Pickup CP"] || "").trim();
-    const cidade = String(pedido["Pickup Cidade"] || "").trim();
-
-    return !!(pickup || cp || cidade);
+    return (
+        valorPreenchido(pedido["Pickup"]) ||
+        valorPreenchido(pedido["Pickup CP"]) ||
+        valorPreenchido(pedido["Pickup Cidade"])
+    );
 
 }
 
