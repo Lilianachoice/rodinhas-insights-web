@@ -14,6 +14,11 @@ let melhorCluster = null;
 // Guarda a lista de oportunidades de expansão atual (para a IA e cliques na tabela)
 let oportunidadesAtuais = [];
 
+const NOMES_MESES = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+];
+
 console.log("Leaflet:", typeof L);
 
 // ==========================================
@@ -261,9 +266,7 @@ const atualizarTudoComDebounce = debounce(atualizarTudo, 200);
 // Nota: pedidos com morada mas ainda sem coordenadas
 // ==========================================
 
-let pedidosPendentesAtuais = [];
-
-function atualizarNotaPendentes(lista) {
+let pedidosPendentesAtuais = [];function atualizarNotaPendentes(lista) {
 
     pedidosPendentesAtuais = lista;
 
@@ -395,7 +398,7 @@ ligarSlider("valorMinimo", "valorMensal", " €");
 // Eventos — filtros
 // ==========================================
 
-["shared", "private", "zona", "cidade", "dias", "ano", "mes"].forEach(id => {
+["shared", "private", "zona", "cidade", "dias", "ano"].forEach(id => {
 
     const el = document.getElementById(id);
 
@@ -414,13 +417,116 @@ ligarSlider("valorMinimo", "valorMensal", " €");
 });
 
 // ==========================================
+// Filtros de Mês Início / Mês Fim de Serviço
+// (multi-seleção por checkboxes — um Set vazio = "Todos")
+// ==========================================
+
+function aoMudarFiltrosDeData() {
+
+    atualizarTudo();
+    atualizarInfoFiltroData();
+
+    if (typeof atualizarPaginaRotas === "function")
+        atualizarPaginaRotas();
+
+}
+
+function construirDropdownMeses(idBotao, idPainel, estadoRef) {
+
+    const botao = document.getElementById(idBotao);
+    const painel = document.getElementById(idPainel);
+
+    if (!botao || !painel)
+        return;
+
+    painel.innerHTML = "";
+
+    NOMES_MESES.forEach((nome, indice) => {
+
+        const numero = indice + 1;
+
+        const label = document.createElement("label");
+        label.className = "mesOpcao";
+
+        label.innerHTML =
+            `<input type="checkbox" value="${numero}"> ${nome}`;
+
+        const checkbox = label.querySelector("input");
+
+        checkbox.checked = estadoRef.set.has(numero);
+
+        checkbox.addEventListener("change", () => {
+
+            if (checkbox.checked)
+                estadoRef.set.add(numero);
+            else
+                estadoRef.set.delete(numero);
+
+            atualizarBotaoMeses(botao, estadoRef.set);
+            aoMudarFiltrosDeData();
+
+        });
+
+        painel.appendChild(label);
+
+    });
+
+    atualizarBotaoMeses(botao, estadoRef.set);
+
+    botao.addEventListener("click", (evento) => {
+
+        evento.stopPropagation();
+
+        document.querySelectorAll(".mesDropdownPainel").forEach(p => {
+
+            if (p !== painel)
+                p.classList.remove("aberto");
+
+        });
+
+        painel.classList.toggle("aberto");
+
+    });
+
+}
+
+function atualizarBotaoMeses(botao, set) {
+
+    if (!set.size) {
+
+        botao.innerText = "Todos";
+        return;
+
+    }
+
+    if (set.size === 1) {
+
+        botao.innerText = NOMES_MESES[[...set][0] - 1];
+        return;
+
+    }
+
+    botao.innerText = `${set.size} meses`;
+
+}
+
+document.addEventListener("click", (evento) => {
+
+    if (!evento.target.closest(".mesDropdown"))
+        document.querySelectorAll(".mesDropdownPainel").forEach(p => p.classList.remove("aberto"));
+
+});
+
+construirDropdownMeses("botaoMesInicio", "painelMesInicio", { set: window.filtroMesesInicio });
+construirDropdownMeses("botaoMesFim", "painelMesFim", { set: window.filtroMesesFim });
+
+// ==========================================
 // Filtros de data — valores por omissão e texto informativo
 // ==========================================
 
 function definirFiltrosDataPorOmissao() {
 
     const anoEl = document.getElementById("ano");
-    const mesEl = document.getElementById("mes");
 
     const anoAtual = String(new Date().getFullYear());
 
@@ -429,15 +535,18 @@ function definirFiltrosDataPorOmissao() {
     if (anoEl && [...anoEl.options].some(o => o.value === anoAtual))
         anoEl.value = anoAtual;
 
-    if (mesEl)
-        mesEl.value = "atual3";
+    // Mês Início de Serviço abre no mês atual; Mês Fim fica em
+    // "Todos" — um serviço que já começou antes e só termina daqui
+    // a meses continua a ser relevante agora
+    const mesAtual = new Date().getMonth() + 1;
+
+    window.filtroMesesInicio = new Set([mesAtual]);
+    window.filtroMesesFim = new Set();
+
+    construirDropdownMeses("botaoMesInicio", "painelMesInicio", { set: window.filtroMesesInicio });
+    construirDropdownMeses("botaoMesFim", "painelMesFim", { set: window.filtroMesesFim });
 
 }
-
-const NOMES_MESES = [
-    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
-];
 
 function atualizarInfoFiltroData() {
 
@@ -446,21 +555,25 @@ function atualizarInfoFiltroData() {
     if (!info)
         return;
 
-    const janela = typeof obterJanelaDatas === "function" ? obterJanelaDatas() : null;
+    const partes = [];
 
-    if (!janela) {
+    if (window.filtroMesesInicio && window.filtroMesesInicio.size) {
 
-        info.innerText = "A mostrar todo o histórico";
-        return;
+        const nomes = [...window.filtroMesesInicio].sort((a, b) => a - b).map(m => NOMES_MESES[m - 1]);
+        partes.push(`início em ${nomes.join(", ")}`);
 
     }
 
-    const formatar = data => `${NOMES_MESES[data.getMonth()]} ${data.getFullYear()}`;
+    if (window.filtroMesesFim && window.filtroMesesFim.size) {
 
-    if (formatar(janela.inicio) === formatar(janela.fim))
-        info.innerText = `A mostrar: ${formatar(janela.inicio)}`;
-    else
-        info.innerText = `A mostrar: ${formatar(janela.inicio)} — ${formatar(janela.fim)}`;
+        const nomes = [...window.filtroMesesFim].sort((a, b) => a - b).map(m => NOMES_MESES[m - 1]);
+        partes.push(`fim em ${nomes.join(", ")}`);
+
+    }
+
+    info.innerText = partes.length
+        ? "A mostrar: " + partes.join(" · ")
+        : "A mostrar todos os meses";
 
 }
 
