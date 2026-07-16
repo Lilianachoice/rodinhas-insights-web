@@ -91,8 +91,7 @@
 </div>
 
 <!-- ========================= -->
-<!-- FILTROS DE DATA (partilhados entre Operação Atual, -->
-<!-- Potencial de Expansão e Potenciais Rotas) -->
+<!-- ANO (partilhado entre todas as páginas) -->
 <!-- ========================= -->
 
 <div id="barraFiltrosData" class="barraFiltrosData">
@@ -107,15 +106,25 @@
 
     </div>
 
+</div>
+
+<!-- ===================================================== -->
+<!-- OPERAÇÃO ATUAL -->
+<!-- ===================================================== -->
+
+<div id="paginaOperacao">
+
+<div class="barraFiltrosData">
+
     <div class="filtroDataItem">
 
         <label>Mês Início de Serviço</label>
 
-        <div class="mesDropdown" id="dropdownMesInicio">
+        <div class="mesDropdown" id="dropdownMesInicioOp">
 
-            <button type="button" class="mesDropdownBotao" id="botaoMesInicio">Todos</button>
+            <button type="button" class="mesDropdownBotao" id="botaoMesInicioOp">Todos</button>
 
-            <div class="mesDropdownPainel" id="painelMesInicio"></div>
+            <div class="mesDropdownPainel" id="painelMesInicioOp"></div>
 
         </div>
 
@@ -125,25 +134,19 @@
 
         <label>Mês Fim de Serviço</label>
 
-        <div class="mesDropdown" id="dropdownMesFim">
+        <div class="mesDropdown" id="dropdownMesFimOp">
 
-            <button type="button" class="mesDropdownBotao" id="botaoMesFim">Todos</button>
+            <button type="button" class="mesDropdownBotao" id="botaoMesFimOp">Todos</button>
 
-            <div class="mesDropdownPainel" id="painelMesFim"></div>
+            <div class="mesDropdownPainel" id="painelMesFimOp"></div>
 
         </div>
 
     </div>
 
-    <div class="filtroDataInfo" id="filtroDataInfo"></div>
+    <div class="filtroDataInfo" id="filtroDataInfoOp"></div>
 
 </div>
-
-<!-- ===================================================== -->
-<!-- OPERAÇÃO ATUAL -->
-<!-- ===================================================== -->
-
-<div id="paginaOperacao">
 
 <main>
 
@@ -470,6 +473,40 @@
 
 <div id="paginaExpansao" style="display:none;">
 
+    <div class="barraFiltrosData">
+
+        <div class="filtroDataItem">
+
+            <label>Mês Início de Serviço</label>
+
+            <div class="mesDropdown" id="dropdownMesInicioExp">
+
+                <button type="button" class="mesDropdownBotao" id="botaoMesInicioExp">Todos</button>
+
+                <div class="mesDropdownPainel" id="painelMesInicioExp"></div>
+
+            </div>
+
+        </div>
+
+        <div class="filtroDataItem">
+
+            <label>Mês Fim de Serviço</label>
+
+            <div class="mesDropdown" id="dropdownMesFimExp">
+
+                <button type="button" class="mesDropdownBotao" id="botaoMesFimExp">Todos</button>
+
+                <div class="mesDropdownPainel" id="painelMesFimExp"></div>
+
+            </div>
+
+        </div>
+
+        <div class="filtroDataInfo" id="filtroDataInfoExp"></div>
+
+    </div>
+
     <section class="expansao">
 
         <h2>🌍 Potencial de Expansão</h2>
@@ -569,6 +606,40 @@
 <!-- ===================================================== -->
 
 <div id="paginaRotas" style="display:none;">
+
+    <div class="barraFiltrosData">
+
+        <div class="filtroDataItem">
+
+            <label>Mês Início de Serviço</label>
+
+            <div class="mesDropdown" id="dropdownMesInicioRotas">
+
+                <button type="button" class="mesDropdownBotao" id="botaoMesInicioRotas">Todos</button>
+
+                <div class="mesDropdownPainel" id="painelMesInicioRotas"></div>
+
+            </div>
+
+        </div>
+
+        <div class="filtroDataItem">
+
+            <label>Mês Fim de Serviço</label>
+
+            <div class="mesDropdown" id="dropdownMesFimRotas">
+
+                <button type="button" class="mesDropdownBotao" id="botaoMesFimRotas">Todos</button>
+
+                <div class="mesDropdownPainel" id="painelMesFimRotas"></div>
+
+            </div>
+
+        </div>
+
+        <div class="filtroDataInfo" id="filtroDataInfoRotas"></div>
+
+    </div>
 
     <section class="expansao">
 
