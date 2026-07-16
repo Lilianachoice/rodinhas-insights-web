@@ -227,7 +227,7 @@ const CONFIG_PARTILHADA_FALLBACK = {
 
     },
 
-    criterioRota: { minPedidos: 3, scoreMinimo: 50 },
+    criterioRota: { ativo: false, minPedidos: 3 },
 
     emailDestino: "",
 
@@ -347,6 +347,26 @@ function preencherCamposRotas() {
     set("viaturasLisboa", config.depositos.lisboa.viaturas);
     set("emailDestino", config.emailDestino);
 
+    const criterio = config.criterioRota || { ativo: false, minPedidos: 3 };
+
+    const radioSim = document.querySelector('input[name="minimoPedidosAtivo"][value="sim"]');
+    const radioNao = document.querySelector('input[name="minimoPedidosAtivo"][value="nao"]');
+    const linhaValor = document.getElementById("linhaMinimoPedidosValor");
+    const campoValor = document.getElementById("minimoPedidosValor");
+
+    if (radioSim && radioNao) {
+
+        radioSim.checked = !!criterio.ativo;
+        radioNao.checked = !criterio.ativo;
+
+    }
+
+    if (campoValor)
+        campoValor.value = criterio.minPedidos || 3;
+
+    if (linhaValor)
+        linhaValor.style.display = criterio.ativo ? "flex" : "none";
+
 }
 
 function iniciarPaginaIndices() {
@@ -403,6 +423,9 @@ function iniciarPaginaIndices() {
 
         botaoRotas.addEventListener("click", async () => {
 
+            const minimoAtivo =
+                document.querySelector('input[name="minimoPedidosAtivo"][value="sim"]').checked;
+
             const patch = {
 
                 turno: {
@@ -422,7 +445,12 @@ function iniciarPaginaIndices() {
 
                 },
 
-                emailDestino: document.getElementById("emailDestino").value || ""
+                emailDestino: document.getElementById("emailDestino").value || "",
+
+                criterioRota: {
+                    ativo: minimoAtivo,
+                    minPedidos: Number(document.getElementById("minimoPedidosValor").value) || 3
+                }
 
             };
 
@@ -432,6 +460,21 @@ function iniciarPaginaIndices() {
 
             if (ok && typeof atualizarPaginaRotas === "function")
                 atualizarPaginaRotas();
+
+        });
+
+        // Mostra/esconde o campo do nº mínimo consoante o Sim/Não
+        document.querySelectorAll('input[name="minimoPedidosAtivo"]').forEach(radio => {
+
+            radio.addEventListener("change", () => {
+
+                const linhaValor = document.getElementById("linhaMinimoPedidosValor");
+                const ativo = document.querySelector('input[name="minimoPedidosAtivo"][value="sim"]').checked;
+
+                if (linhaValor)
+                    linhaValor.style.display = ativo ? "flex" : "none";
+
+            });
 
         });
 
