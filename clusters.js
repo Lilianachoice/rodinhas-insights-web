@@ -65,6 +65,22 @@ function pedidoTemPickupValido(pedido) {
 
 }
 
+// "Tem morada" = tem alguma informação de localização (endereço, CP
+// ou cidade) — isto é o que define se um pedido é dentro da área de
+// atuação (Operação Atual), independentemente de já ter ou não
+// coordenadas geocodificadas. Um pedido pode ter morada completa e
+// ainda assim não ter Lat/Lng (geocoding pendente ou falhado) — esse
+// continua a ser Operação Atual, só não aparece no mapa.
+function pedidoTemMorada(pedido) {
+
+    const pickup = String(pedido["Pickup"] || "").trim();
+    const cp = String(pedido["Pickup CP"] || "").trim();
+    const cidade = String(pedido["Pickup Cidade"] || "").trim();
+
+    return !!(pickup || cp || cidade);
+
+}
+
 // ==========================================
 // DISTÂNCIA ENTRE DOIS PONTOS (haversine, em km)
 // ==========================================
