@@ -14,6 +14,41 @@ let melhorCluster = null;
 // Guarda a lista de oportunidades de expansão atual (para a IA e cliques na tabela)
 let oportunidadesAtuais = [];
 
+// ==========================================
+// Excluir pedido de teste (rápido, a partir de qualquer tabela)
+// ==========================================
+
+async function excluirPedidoTeste(id) {
+
+    if (!confirm(`Marcar o pedido ${id} como teste e escondê-lo em todo o site?`))
+        return;
+
+    const config = window.configPartilhada || {};
+
+    const atuais = (config.idsExcluidos || []).map(String);
+
+    if (!atuais.includes(String(id)))
+        atuais.push(String(id));
+
+    const ok = await guardarConfigPartilhadaNoBackend({ idsExcluidos: atuais });
+
+    if (!ok) {
+
+        alert("Não foi possível guardar. Tenta novamente.");
+        return;
+
+    }
+
+    if (typeof preencherCampoIdsExcluidos === "function")
+        preencherCampoIdsExcluidos();
+
+    atualizarTudo();
+
+    if (typeof atualizarPaginaRotas === "function")
+        atualizarPaginaRotas();
+
+}
+
 const NOMES_MESES = [
     "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
@@ -908,11 +943,18 @@ function obterOportunidadesExpansao(listaPedidos) {
         const metricaShared = grupo.pedidos ? grupo.shared / grupo.pedidos : 0;
         const metricaPrivate = grupo.pedidos ? grupo.private / grupo.pedidos : 0;
 
-        const score =
+        const somaBruta =
             metricaPedidos * pesos.pedidos +
             metricaPassageiros * pesos.passageiros +
             metricaShared * pesos.shared +
             metricaPrivate * pesos.private;
+
+        const somaPesosPositivos =
+            Object.values(pesos)
+                .filter(peso => peso > 0)
+                .reduce((soma, peso) => soma + peso, 0) || 1;
+
+        const score = (somaBruta / somaPesosPositivos) * 100;
 
         grupo.score = Math.max(0, Math.min(100, Math.round(score)));
 
