@@ -122,7 +122,6 @@ function desenharPedidos(clusters) {
         marcador.on("click", () => {
 
             clusterSelecionado = cluster;
-
             mostrarDetalheCluster(cluster);
 
         });
@@ -162,6 +161,9 @@ function criarPopup(cluster) {
 
     }
 
+    const score =
+        cluster.score !== undefined ? cluster.score : "--";
+
     return `
 
 <div class="popupCluster">
@@ -175,6 +177,7 @@ function criarPopup(cluster) {
     <div class="popupTipo">
 
         ${cor} ${tipo}
+        <span class="popupScore">Índice ${score}</span>
 
     </div>
 
@@ -182,7 +185,7 @@ function criarPopup(cluster) {
 
     <div class="popupNumero">
 
-        👥 ${total} pedidos
+        👥 ${total} pedidos • ${cluster.totalPassageiros || total} passageiros
 
     </div>
 
@@ -231,6 +234,23 @@ function mostrarPedidosCluster(id) {
 
 }
 
+function formatarHora(hora) {
+
+    if (!hora)
+        return "—";
+
+    const minutos = horaParaMinutos(hora);
+
+    if (minutos === null)
+        return String(hora);
+
+    const h = String(Math.floor(minutos / 60)).padStart(2, "0");
+    const m = String(minutos % 60).padStart(2, "0");
+
+    return `${h}:${m}`;
+
+}
+
 function mostrarDetalheCluster(cluster) {
 
     const detalhe =
@@ -241,6 +261,9 @@ function mostrarDetalheCluster(cluster) {
 
     const total =
         cluster.pedidos.length;
+
+    const score =
+        cluster.score !== undefined ? cluster.score : "--";
 
     let html = `
 
@@ -256,7 +279,8 @@ function mostrarDetalheCluster(cluster) {
 
         <div class="clusterSubtitulo">
 
-            Cluster selecionado
+            Cluster selecionado • Índice de Oportunidade
+            <span class="badgeScore">${score}</span>
 
         </div>
 
@@ -283,6 +307,22 @@ function mostrarDetalheCluster(cluster) {
         <div class="infoValor">
 
             ${total}
+
+        </div>
+
+    </div>
+
+    <div class="infoBox">
+
+        <div class="infoTitulo">
+
+            Passageiros
+
+        </div>
+
+        <div class="infoValor">
+
+            ${cluster.totalPassageiros || total}
 
         </div>
 
@@ -322,6 +362,8 @@ function mostrarDetalheCluster(cluster) {
 
 </div>
 
+<div class="tabelaScrollWrapper">
+
 <table class="tabelaPedidos">
 
 <thead>
@@ -329,9 +371,11 @@ function mostrarDetalheCluster(cluster) {
 <tr>
 
 <th>ID</th>
-
 <th>Tipo</th>
-
+<th>Hora Pickup</th>
+<th>Morada Pickup</th>
+<th>Morada Dropoff</th>
+<th>Dias</th>
 <th>Mensalidade</th>
 
 </tr>
@@ -352,27 +396,36 @@ function mostrarDetalheCluster(cluster) {
 
                 : '<span class="tipoPrivate">Private</span>';
 
+        const moradaPickup = [
+            pedido["Pickup"],
+            pedido["Pickup CP"],
+            pedido["Pickup Cidade"]
+        ].filter(Boolean).join(", ") || "—";
+
+        const moradaDropoff = [
+            pedido["Dropoff"],
+            pedido["Dropoff Cidade"]
+        ].filter(Boolean).join(", ") || "—";
+
+        const dias = obterDiasPedido(pedido).join(", ") || "—";
+
         html += `
 
 <tr>
 
-<td>
+<td>${pedido["ID"] || "-"}</td>
 
-${pedido["ID"] || "-"}
+<td>${tipo}</td>
 
-</td>
+<td>${formatarHora(pedido["Pickup Hora"])}</td>
 
-<td>
+<td>${moradaPickup}</td>
 
-${tipo}
+<td>${moradaDropoff}</td>
 
-</td>
+<td>${dias}</td>
 
-<td>
-
-${(Number(pedido["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €
-
-</td>
+<td>${(Number(pedido["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €</td>
 
 </tr>
 
@@ -385,6 +438,8 @@ ${(Number(pedido["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €
 </tbody>
 
 </table>
+
+</div>
 
 `;
 
