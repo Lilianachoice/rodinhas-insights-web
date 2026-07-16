@@ -439,15 +439,27 @@ console.log("App.js carregado");
 // OPORTUNIDADES DE EXPANSÃO
 // ==========================================
 
+function cpValido(cp) {
+
+    // Um código postal português válido tem pelo menos 4 dígitos.
+    // Isto exclui células vazias, "-", "N/A" e outros placeholders
+    // que às vezes aparecem na Sheet em vez de ficarem em branco.
+    return /^\d{4}/.test(cp);
+
+}
+
 function obterOportunidadesExpansao(listaPedidos) {
 
     const grupos = {};
 
     listaPedidos.forEach(p => {
 
-        const cpCompleto = (p["Pickup CP"] || "").trim();
+        // String(...) primeiro: a Sheet por vezes devolve o CP como
+        // número (ex: 2691 em vez de "2691-000"), o que fazia esta
+        // função rebentar ao chamar .trim() diretamente num número.
+        const cpCompleto = String(p["Pickup CP"] || "").trim();
 
-        if (!cpCompleto)
+        if (!cpValido(cpCompleto))
             return;
 
         const cp = cpCompleto.substring(0, 4);
