@@ -264,12 +264,21 @@ function obterPeriodoPedido(pedido) {
 
 }
 
-// Estado dos dois filtros de mês (Início / Fim do serviço).
+// Estado dos filtros de mês — agora independente por página
+// (Operação Atual / Potencial de Expansão / Potenciais Rotas).
 // Um Set vazio significa "Todos" (sem restrição nesse filtro).
-window.filtroMesesInicio = new Set();
-window.filtroMesesFim = new Set();
+window.filtroMesesInicioOp = new Set();
+window.filtroMesesFimOp = new Set();
+window.filtroMesesInicioExp = new Set();
+window.filtroMesesFimExp = new Set();
+window.filtroMesesInicioRotas = new Set();
+window.filtroMesesFimRotas = new Set();
 
-function obterPedidosFiltrados(listaPedidos) {
+// Filtros comuns a todas as páginas: Shared/Private, valor mínimo,
+// zona, cidade, dias e ano. NÃO inclui o filtro de mês (esse é
+// aplicado depois, de forma independente, por cada página — ver
+// aplicarFiltroMeses).
+function obterPedidosFiltradosComuns(listaPedidos) {
 
     const usarShared =
         document.getElementById("shared").checked;
@@ -292,9 +301,6 @@ function obterPedidosFiltrados(listaPedidos) {
     const ano =
         document.getElementById("ano") ?
             document.getElementById("ano").value : "";
-
-    const mesesInicio = window.filtroMesesInicio || new Set();
-    const mesesFim = window.filtroMesesFim || new Set();
 
     return listaPedidos.filter(p => {
 
@@ -329,14 +335,31 @@ function obterPedidosFiltrados(listaPedidos) {
 
         }
 
-        // Ano (aplicado sobre a data do pedido / início de serviço)
+        // Ano (partilhado entre todas as páginas)
         if (ano && obterAno(p) !== ano)
             return false;
 
+        return true;
+
+    });
+
+}
+
+// Aplica o filtro de Mês Início / Mês Fim de Serviço a uma lista já
+// filtrada pelos filtros comuns. Cada página passa os seus próprios
+// Sets, para que a seleção seja independente entre páginas.
+function aplicarFiltroMeses(listaPedidos, mesesInicio, mesesFim) {
+
+    if (!mesesInicio) mesesInicio = new Set();
+    if (!mesesFim) mesesFim = new Set();
+
+    if (!mesesInicio.size && !mesesFim.size)
+        return listaPedidos;
+
+    return listaPedidos.filter(p => {
+
         const periodo = obterPeriodoPedido(p);
 
-        // Mês de Início de Serviço — só filtra quem tem essa data;
-        // pedidos sem Start Date não são escondidos por causa disto
         if (mesesInicio.size && periodo.inicio) {
 
             if (!mesesInicio.has(periodo.inicio.getMonth() + 1))
@@ -344,7 +367,6 @@ function obterPedidosFiltrados(listaPedidos) {
 
         }
 
-        // Mês de Fim de Serviço — mesma lógica, sobre End Date
         if (mesesFim.size && periodo.fim) {
 
             if (!mesesFim.has(periodo.fim.getMonth() + 1))
@@ -355,6 +377,17 @@ function obterPedidosFiltrados(listaPedidos) {
         return true;
 
     });
+
+}
+
+// Mantido por compatibilidade: filtros comuns + filtro de mês da
+// Operação Atual, para quem ainda chame a função "antiga" com um
+// único argumento.
+function obterPedidosFiltrados(listaPedidos) {
+
+    const comuns = obterPedidosFiltradosComuns(listaPedidos);
+
+    return aplicarFiltroMeses(comuns, window.filtroMesesInicioOp, window.filtroMesesFimOp);
 
 }
 
