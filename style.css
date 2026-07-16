@@ -1460,3 +1460,64 @@ Nenhuma oportunidade encontrada.
     }
 
 }
+
+/* ===========================
+   DROPDOWN DE MESES (multi-seleção)
+=========================== */
+
+.mesDropdown{
+    position:relative;
+}
+
+.mesDropdownBotao{
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:7px 14px;
+    font-family:Poppins,sans-serif;
+    font-size:14px;
+    background:#f9fafc;
+    cursor:pointer;
+    min-width:110px;
+    text-align:left;
+}
+
+.mesDropdownBotao:hover{
+    border-color:#0b5ed7;
+}
+
+.mesDropdownPainel{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    padding:10px;
+    z-index:100;
+    min-width:170px;
+    max-height:280px;
+    overflow-y:auto;
+}
+
+.mesDropdownPainel.aberto{
+    display:block;
+}
+
+.mesOpcao{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 8px;
+    font-size:14px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.mesOpcao:hover{
+    background:#f5f7fb;
+}
+
+.mesOpcao input{
+    cursor:pointer;
+}
