@@ -184,10 +184,14 @@ function construirRotasPotenciaisSite() {
 
     const config = window.configPartilhada;
 
-    // Aplica os mesmos filtros da Operação Atual (incluindo a janela
-    // de datas Ano/Mês) — assim as Potenciais Rotas refletem sempre
-    // o mesmo período que se está a analisar nas outras páginas
-    const pedidosComFiltros = obterPedidosFiltrados(pedidos);
+    // Filtros comuns (Shared/Private, zona, cidade, dias, ano) +
+    // filtro de mês próprio desta página (independente de Operação
+    // Atual e Potencial de Expansão)
+    const pedidosComuns = obterPedidosFiltradosComuns(pedidos);
+
+    const pedidosComFiltros = aplicarFiltroMeses(
+        pedidosComuns, window.filtroMesesInicioRotas, window.filtroMesesFimRotas
+    );
 
     const pedidosValidos = pedidosComFiltros
         .filter(pedidoTemMorada)
