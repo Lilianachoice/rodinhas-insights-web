@@ -38,11 +38,29 @@ function coordenadasValidas(lat, lng) {
 
 }
 
+// Converte valores vindos da Sheet para número de forma robusta:
+// - já numéricos -> devolve tal e qual
+// - texto com vírgula decimal (formato PT, ex: "41,137") -> converte
+// - espaços/células vazias -> NaN
+function paraNumero(valor) {
+
+    if (typeof valor === "number")
+        return valor;
+
+    if (valor === null || valor === undefined || valor === "")
+        return NaN;
+
+    const texto = String(valor).trim().replace(",", ".");
+
+    return Number(texto);
+
+}
+
 function pedidoTemPickupValido(pedido) {
 
     return coordenadasValidas(
-        Number(pedido["Pickup Lat"]),
-        Number(pedido["Pickup Lng"])
+        paraNumero(pedido["Pickup Lat"]),
+        paraNumero(pedido["Pickup Lng"])
     );
 
 }
@@ -304,11 +322,11 @@ function criarClusters(listaPedidos) {
 
     validos.forEach(pedido => {
 
-        const lat = Number(pedido["Pickup Lat"]);
-        const lng = Number(pedido["Pickup Lng"]);
+        const lat = paraNumero(pedido["Pickup Lat"]);
+        const lng = paraNumero(pedido["Pickup Lng"]);
 
-        const latD = Number(pedido["Dropoff Lat"]);
-        const lngD = Number(pedido["Dropoff Lng"]);
+        const latD = paraNumero(pedido["Dropoff Lat"]);
+        const lngD = paraNumero(pedido["Dropoff Lng"]);
 
         const passageiros =
             Number(pedido["Total Passengers"]) || 1;
@@ -476,10 +494,10 @@ function calcularIndicesOperacao(clusters) {
 
                 somaDist += distanciaKm(
 
-                    Number(cluster.pedidos[i]["Pickup Lat"]),
-                    Number(cluster.pedidos[i]["Pickup Lng"]),
-                    Number(cluster.pedidos[j]["Pickup Lat"]),
-                    Number(cluster.pedidos[j]["Pickup Lng"])
+                    paraNumero(cluster.pedidos[i]["Pickup Lat"]),
+                    paraNumero(cluster.pedidos[i]["Pickup Lng"]),
+                    paraNumero(cluster.pedidos[j]["Pickup Lat"]),
+                    paraNumero(cluster.pedidos[j]["Pickup Lng"])
 
                 );
 
