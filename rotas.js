@@ -8,8 +8,8 @@
 
 function obterDepositoMaisProximoSite(pedido, config) {
 
-    const lat = Number(pedido["Pickup Lat"]);
-    const lng = Number(pedido["Pickup Lng"]);
+    const lat = paraNumero(pedido["Pickup Lat"]);
+    const lng = paraNumero(pedido["Pickup Lng"]);
 
     const distPorto = distanciaKm(lat, lng, config.depositos.porto.lat, config.depositos.porto.lng);
     const distLisboa = distanciaKm(lat, lng, config.depositos.lisboa.lat, config.depositos.lisboa.lng);
@@ -43,10 +43,10 @@ function construirClustersDepositoSite(pedidosDeposito, config, chaveDeposito) {
 
     pedidosDeposito.forEach(pedido => {
 
-        const lat = Number(pedido["Pickup Lat"]);
-        const lng = Number(pedido["Pickup Lng"]);
-        const latD = Number(pedido["Dropoff Lat"]);
-        const lngD = Number(pedido["Dropoff Lng"]);
+        const lat = paraNumero(pedido["Pickup Lat"]);
+        const lng = paraNumero(pedido["Pickup Lng"]);
+        const latD = paraNumero(pedido["Dropoff Lat"]);
+        const lngD = paraNumero(pedido["Dropoff Lng"]);
         const passageiros = Number(pedido["Total Passengers"]) || 1;
 
         let alvo = null;
