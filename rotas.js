@@ -162,7 +162,7 @@ function pontuarClustersRotas(clusters, pesos) {
         const diasValores = Object.values(contagemDias);
         const metricaDias = diasValores.length ? Math.max(...diasValores) / total : 0.5;
 
-        const score =
+        const somaBruta =
             (cluster.receita / maxReceita) * pesos.receita +
             (total / maxPedidos) * pesos.pedidos +
             (cluster.totalPassageiros / maxPassageiros) * pesos.passageiros +
@@ -170,6 +170,13 @@ function pontuarClustersRotas(clusters, pesos) {
             (total ? cluster.private / total : 0) * pesos.private +
             metricaHorario * pesos.horario +
             metricaDias * pesos.dias;
+
+        const somaPesosPositivos =
+            Object.values(pesos)
+                .filter(peso => peso > 0)
+                .reduce((soma, peso) => soma + peso, 0) || 1;
+
+        const score = (somaBruta / somaPesosPositivos) * 100;
 
         cluster.score = Math.max(0, Math.min(100, Math.round(score)));
 
@@ -356,7 +363,7 @@ function mostrarDetalheRota(indice) {
         html += `
             <tr>
                 <td>${pedido["ID"] || "-"}</td>
-                <td>${pedido["Pickup Hora"] || "—"}</td>
+                <td>${formatarHora(pedido["Pickup Hora"])}</td>
                 <td>${morada}</td>
                 <td>${obterDiasPedido(pedido).join(", ") || "—"}</td>
             </tr>
