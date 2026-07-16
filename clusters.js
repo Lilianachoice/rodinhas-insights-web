@@ -278,6 +278,17 @@ window.filtroMesesFimRotas = new Set();
 // zona, cidade, dias e ano. NÃO inclui o filtro de mês (esse é
 // aplicado depois, de forma independente, por cada página — ver
 // aplicarFiltroMeses).
+// Verifica se um pedido foi marcado manualmente como excluído
+// (ex: pedidos de teste) na configuração partilhada
+function pedidoExcluido(pedido) {
+
+    const excluidos =
+        (window.configPartilhada && window.configPartilhada.idsExcluidos) || [];
+
+    return excluidos.map(String).includes(String(pedido["ID"]));
+
+}
+
 function obterPedidosFiltradosComuns(listaPedidos) {
 
     const usarShared =
@@ -303,6 +314,10 @@ function obterPedidosFiltradosComuns(listaPedidos) {
             document.getElementById("ano").value : "";
 
     return listaPedidos.filter(p => {
+
+        // Excluídos manualmente (ex: pedidos de teste)
+        if (pedidoExcluido(p))
+            return false;
 
         // Shared / Private
         if (p["Transport Type"] === "Shared" && !usarShared)
@@ -633,7 +648,7 @@ function calcularIndicesOperacao(clusters) {
 
         cluster.metricas = metricas;
 
-        let score =
+        const somaBruta =
             metricas.receita * pesos.receita +
             metricas.pedidos * pesos.pedidos +
             metricas.passageiros * pesos.passageiros +
@@ -644,6 +659,21 @@ function calcularIndicesOperacao(clusters) {
             metricas.distancia * pesos.distanciaPickups +
             metricas.duracao * pesos.duracaoServico +
             metricas.servicosAtivos * pesos.servicosAtivos;
+
+        // Normaliza pela soma dos pesos positivos (o máximo teórico
+        // que um cluster "perfeito" atingiria com estes pesos).
+        // Sem isto, se os pesos configurados somarem mais de 100%
+        // (é fácil de acontecer, cada slider vai até 50%), qualquer
+        // cluster razoavelmente bom bate no teto de 100 e vários
+        // clusters bem diferentes entre si ficam todos com o mesmo
+        // score — o que escondia, por exemplo, um cluster com 3
+        // pedidos a aparecer empatado com um de só 1 pedido.
+        const somaPesosPositivos =
+            Object.values(pesos)
+                .filter(peso => peso > 0)
+                .reduce((soma, peso) => soma + peso, 0) || 1;
+
+        const score = (somaBruta / somaPesosPositivos) * 100;
 
         cluster.score = Math.max(0, Math.min(100, Math.round(score)));
 
