@@ -561,6 +561,11 @@ const PESOS_EXPANSAO_DEFAULT = {
 
 function obterPesosOperacao() {
 
+    // Prioridade: configuração partilhada (backend, vinda da Sheet) >
+    // cache local (localStorage) > valores por omissão
+    if (window.configPartilhada && window.configPartilhada.pesosOperacao)
+        return { ...PESOS_OPERACAO_DEFAULT, ...window.configPartilhada.pesosOperacao };
+
     try {
 
         const guardado = localStorage.getItem("pesosOperacao");
@@ -575,6 +580,9 @@ function obterPesosOperacao() {
 }
 
 function obterPesosExpansao() {
+
+    if (window.configPartilhada && window.configPartilhada.pesosExpansao)
+        return { ...PESOS_EXPANSAO_DEFAULT, ...window.configPartilhada.pesosExpansao };
 
     try {
 
