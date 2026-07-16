@@ -545,6 +545,54 @@
 
         </p>
 
+        <div class="cartaoIndice">
+
+            <h3>🚐 Turnos, Depósitos e Notificações</h3>
+
+            <p class="descIndice">
+
+                Usado nesta página e na notificação diária por email. Estes valores
+                são partilhados com o Apps Script.
+
+            </p>
+
+            <div class="linhasConfigRotas">
+
+                <div class="linhaSlider">
+                    <div class="labelSlider"><span>Início do turno</span></div>
+                    <input type="time" id="turnoInicio">
+                </div>
+
+                <div class="linhaSlider">
+                    <div class="labelSlider"><span>Fim do turno</span></div>
+                    <input type="time" id="turnoFim">
+                </div>
+
+                <div class="linhaSlider">
+                    <div class="labelSlider"><span>Viaturas — Porto (Lake Towers)</span></div>
+                    <input type="number" id="viaturasPorto" min="0" max="10">
+                </div>
+
+                <div class="linhaSlider">
+                    <div class="labelSlider"><span>Viaturas — Lisboa (Prior Velho)</span></div>
+                    <input type="number" id="viaturasLisboa" min="0" max="10">
+                </div>
+
+                <div class="linhaSlider linhaSliderLarga">
+                    <div class="labelSlider"><span>Email(s) para notificações</span></div>
+                    <input type="text" id="emailDestino" placeholder="nome@rodinhas.pt, outro@rodinhas.pt">
+                </div>
+
+            </div>
+
+            <button id="guardarConfigRotas" class="botaoGuardar">
+                Guardar
+            </button>
+
+            <span id="confirmacaoRotas" class="confirmacaoGuardar"></span>
+
+        </div>
+
         <div class="depositosGrid" id="depositosGrid">
 
             <!-- Cartões de depósito (Porto / Lisboa) gerados por rotas.js -->
@@ -610,50 +658,6 @@
                 </button>
 
                 <span id="confirmacaoExpansao" class="confirmacaoGuardar"></span>
-
-            </div>
-
-            <div class="cartaoIndice">
-
-                <h3>🛣️ Turnos, Depósitos e Notificações</h3>
-
-                <p class="descIndice">
-
-                    Usado na página "Potenciais Rotas" e na notificação diária por
-                    email. Estes valores são partilhados com o Apps Script.
-
-                </p>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Início do turno</span></div>
-                    <input type="time" id="turnoInicio">
-                </div>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Fim do turno</span></div>
-                    <input type="time" id="turnoFim">
-                </div>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Viaturas — Porto (Lake Towers)</span></div>
-                    <input type="number" id="viaturasPorto" min="0" max="10">
-                </div>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Viaturas — Lisboa (Prior Velho)</span></div>
-                    <input type="number" id="viaturasLisboa" min="0" max="10">
-                </div>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Email(s) para notificações</span></div>
-                    <input type="text" id="emailDestino" placeholder="nome@rodinhas.pt, outro@rodinhas.pt">
-                </div>
-
-                <button id="guardarConfigRotas" class="botaoGuardar">
-                    Guardar
-                </button>
-
-                <span id="confirmacaoRotas" class="confirmacaoGuardar"></span>
 
             </div>
 
