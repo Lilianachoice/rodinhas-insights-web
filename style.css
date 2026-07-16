@@ -1495,7 +1495,7 @@ Nenhuma oportunidade encontrada.
     border-radius:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.15);
     padding:10px;
-    z-index:100;
+    z-index:2000;
     min-width:170px;
     max-height:280px;
     overflow-y:auto;
