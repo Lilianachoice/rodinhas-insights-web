@@ -61,12 +61,10 @@ async function carregarPedidos() {
         // Preenche Zona / Localidade / Ano a partir dos dados reais
         popularListasDinamicas(pedidos);
 
-        // Valores por omissão: ano atual + "mês atual + 2 seguintes"
+        // Valores por omissão: ano atual + mês atual, por página
         definirFiltrosDataPorOmissao();
 
         atualizarTudo();
-
-        atualizarInfoFiltroData();
 
     }
     catch (erro) {
@@ -214,14 +212,23 @@ function atualizarInsights(listaPedidos, clusters) {
 
 function atualizarTudo() {
 
-    const pedidosFiltrados =
-        obterPedidosFiltrados(pedidos);
+    const pedidosComuns =
+        obterPedidosFiltradosComuns(pedidos);
 
     // Operação Atual = tem morada (dentro da área de atuação),
     // mesmo que ainda não tenha coordenadas exatas.
     // Potencial de Expansão = não tem morada nenhuma (fora da área).
-    const pedidosOperacao = pedidosFiltrados.filter(pedidoTemMorada);
-    const pedidosExpansao = pedidosFiltrados.filter(p => !pedidoTemMorada(p));
+    const pedidosOperacaoBase = pedidosComuns.filter(pedidoTemMorada);
+    const pedidosExpansaoBase = pedidosComuns.filter(p => !pedidoTemMorada(p));
+
+    // Mês Início/Fim de Serviço — independente por página
+    const pedidosOperacao = aplicarFiltroMeses(
+        pedidosOperacaoBase, window.filtroMesesInicioOp, window.filtroMesesFimOp
+    );
+
+    const pedidosExpansao = aplicarFiltroMeses(
+        pedidosExpansaoBase, window.filtroMesesInicioExp, window.filtroMesesFimExp
+    );
 
     // Dentro da Operação Atual, só quem já tem coordenadas válidas
     // é que aparece no mapa e entra nos clusters
@@ -407,8 +414,6 @@ ligarSlider("valorMinimo", "valorMensal", " €");
 
             atualizarTudo();
 
-            atualizarInfoFiltroData();
-
             if (typeof atualizarPaginaRotas === "function")
                 atualizarPaginaRotas();
 
@@ -419,19 +424,36 @@ ligarSlider("valorMinimo", "valorMensal", " €");
 // ==========================================
 // Filtros de Mês Início / Mês Fim de Serviço
 // (multi-seleção por checkboxes — um Set vazio = "Todos")
+// Independentes por página: Operação Atual, Potencial de Expansão
+// e Potenciais Rotas.
 // ==========================================
 
-function aoMudarFiltrosDeData() {
+// Cada entrada liga os IDs do HTML ao Set de estado correspondente
+// e diz o que atualizar quando o filtro dessa página muda.
+const PAGINAS_FILTRO_MES = [
 
-    atualizarTudo();
-    atualizarInfoFiltroData();
+    {
+        sufixo: "Op",
+        setInicio: () => window.filtroMesesInicioOp,
+        setFim: () => window.filtroMesesFimOp,
+        aoMudar: () => atualizarTudo()
+    },
+    {
+        sufixo: "Exp",
+        setInicio: () => window.filtroMesesInicioExp,
+        setFim: () => window.filtroMesesFimExp,
+        aoMudar: () => atualizarTudo()
+    },
+    {
+        sufixo: "Rotas",
+        setInicio: () => window.filtroMesesInicioRotas,
+        setFim: () => window.filtroMesesFimRotas,
+        aoMudar: () => { if (typeof atualizarPaginaRotas === "function") atualizarPaginaRotas(); }
+    }
 
-    if (typeof atualizarPaginaRotas === "function")
-        atualizarPaginaRotas();
+];
 
-}
-
-function construirDropdownMeses(idBotao, idPainel, estadoRef) {
+function construirDropdownMeses(idBotao, idPainel, estadoRef, aoMudar) {
 
     const botao = document.getElementById(idBotao);
     const painel = document.getElementById(idPainel);
@@ -463,7 +485,9 @@ function construirDropdownMeses(idBotao, idPainel, estadoRef) {
                 estadoRef.set.delete(numero);
 
             atualizarBotaoMeses(botao, estadoRef.set);
-            aoMudarFiltrosDeData();
+
+            if (aoMudar)
+                aoMudar();
 
         });
 
@@ -526,8 +550,37 @@ document.addEventListener("click", (evento) => {
 
 });
 
-construirDropdownMeses("botaoMesInicio", "painelMesInicio", { set: window.filtroMesesInicio });
-construirDropdownMeses("botaoMesFim", "painelMesFim", { set: window.filtroMesesFim });
+function construirTodosDropdownsMeses() {
+
+    PAGINAS_FILTRO_MES.forEach(pagina => {
+
+        construirDropdownMeses(
+            `botaoMesInicio${pagina.sufixo}`, `painelMesInicio${pagina.sufixo}`,
+            { set: pagina.setInicio() },
+            () => {
+
+                pagina.aoMudar();
+                atualizarInfoFiltroData(pagina.sufixo);
+
+            }
+        );
+
+        construirDropdownMeses(
+            `botaoMesFim${pagina.sufixo}`, `painelMesFim${pagina.sufixo}`,
+            { set: pagina.setFim() },
+            () => {
+
+                pagina.aoMudar();
+                atualizarInfoFiltroData(pagina.sufixo);
+
+            }
+        );
+
+    });
+
+}
+
+construirTodosDropdownsMeses();
 
 // ==========================================
 // Filtros de data — valores por omissão e texto informativo
@@ -544,38 +597,52 @@ function definirFiltrosDataPorOmissao() {
     if (anoEl && [...anoEl.options].some(o => o.value === anoAtual))
         anoEl.value = anoAtual;
 
-    // Mês Início de Serviço abre no mês atual; Mês Fim fica em
-    // "Todos" — um serviço que já começou antes e só termina daqui
-    // a meses continua a ser relevante agora
+    // Mês Início de Serviço abre no mês atual, em CADA página,
+    // de forma independente; Mês Fim fica em "Todos" — um serviço
+    // que já começou antes e só termina daqui a meses continua a
+    // ser relevante agora
     const mesAtual = new Date().getMonth() + 1;
 
-    window.filtroMesesInicio = new Set([mesAtual]);
-    window.filtroMesesFim = new Set();
+    window.filtroMesesInicioOp = new Set([mesAtual]);
+    window.filtroMesesFimOp = new Set();
+    window.filtroMesesInicioExp = new Set([mesAtual]);
+    window.filtroMesesFimExp = new Set();
+    window.filtroMesesInicioRotas = new Set([mesAtual]);
+    window.filtroMesesFimRotas = new Set();
 
-    construirDropdownMeses("botaoMesInicio", "painelMesInicio", { set: window.filtroMesesInicio });
-    construirDropdownMeses("botaoMesFim", "painelMesFim", { set: window.filtroMesesFim });
+    construirTodosDropdownsMeses();
+
+    PAGINAS_FILTRO_MES.forEach(pagina => atualizarInfoFiltroData(pagina.sufixo));
 
 }
 
-function atualizarInfoFiltroData() {
+function atualizarInfoFiltroData(sufixo) {
 
-    const info = document.getElementById("filtroDataInfo");
+    const info = document.getElementById(`filtroDataInfo${sufixo}`);
 
     if (!info)
         return;
 
+    const pagina = PAGINAS_FILTRO_MES.find(p => p.sufixo === sufixo);
+
+    if (!pagina)
+        return;
+
+    const mesesInicio = pagina.setInicio();
+    const mesesFim = pagina.setFim();
+
     const partes = [];
 
-    if (window.filtroMesesInicio && window.filtroMesesInicio.size) {
+    if (mesesInicio && mesesInicio.size) {
 
-        const nomes = [...window.filtroMesesInicio].sort((a, b) => a - b).map(m => NOMES_MESES[m - 1]);
+        const nomes = [...mesesInicio].sort((a, b) => a - b).map(m => NOMES_MESES[m - 1]);
         partes.push(`início em ${nomes.join(", ")}`);
 
     }
 
-    if (window.filtroMesesFim && window.filtroMesesFim.size) {
+    if (mesesFim && mesesFim.size) {
 
-        const nomes = [...window.filtroMesesFim].sort((a, b) => a - b).map(m => NOMES_MESES[m - 1]);
+        const nomes = [...mesesFim].sort((a, b) => a - b).map(m => NOMES_MESES[m - 1]);
         partes.push(`fim em ${nomes.join(", ")}`);
 
     }
@@ -586,7 +653,7 @@ function atualizarInfoFiltroData() {
 
 }
 
-// Esconde a barra de filtros de data na página de Configuração
+// Esconde a barra de Ano na página de Configuração
 // (não faz sentido lá — não filtra nenhuma tabela)
 function atualizarVisibilidadeBarraFiltrosData(paginaAtiva) {
 
