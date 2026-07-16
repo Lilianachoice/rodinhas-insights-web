@@ -189,22 +189,131 @@ function mostrarConfirmacao(idSpan) {
 
 }
 
+// ==========================================
+// CONFIGURAÇÃO PARTILHADA (backend / Apps Script)
+// ==========================================
+// Mesma chave que está em CONFIG.FRONTEND_KEY no config.gs.
+// Muda os dois valores juntos se quiseres uma chave só tua.
+const FRONTEND_KEY = "rodinhas-config-2026";
+
+async function carregarConfigPartilhada() {
+
+    try {
+
+        const resposta = await fetch(API_URL + "?recurso=config");
+
+        window.configPartilhada = await resposta.json();
+
+    }
+    catch (erro) {
+
+        console.error("Não foi possível carregar a configuração partilhada:", erro);
+
+        // Sem configuração partilhada, os pesos caem para localStorage/defaults
+        // (ver obterPesosOperacao/obterPesosExpansao em clusters.js)
+        window.configPartilhada = null;
+
+    }
+
+}
+
+async function guardarConfigPartilhadaNoBackend(patch) {
+
+    try {
+
+        const resposta = await fetch(API_URL, {
+
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ chave: FRONTEND_KEY, config: patch })
+
+        });
+
+        const dados = await resposta.json();
+
+        if (dados.ok) {
+
+            window.configPartilhada = dados.config;
+            return true;
+
+        }
+
+        console.error("Erro ao guardar configuração partilhada:", dados.erro);
+        return false;
+
+    }
+    catch (erro) {
+
+        console.error("Erro ao guardar configuração partilhada:", erro);
+        return false;
+
+    }
+
+}
+
+function preencherCamposRotas() {
+
+    const config = window.configPartilhada;
+
+    if (!config)
+        return;
+
+    const set = (id, valor) => {
+
+        const el = document.getElementById(id);
+
+        if (el) el.value = valor;
+
+    };
+
+    set("turnoInicio", config.turno.inicio);
+    set("turnoFim", config.turno.fim);
+    set("viaturasPorto", config.depositos.porto.viaturas);
+    set("viaturasLisboa", config.depositos.lisboa.viaturas);
+    set("emailDestino", config.emailDestino);
+
+}
+
 function iniciarPaginaIndices() {
 
     construirSliders("slidersOperacao", METRICAS_OPERACAO, obterPesosOperacao());
     construirSliders("slidersExpansao", METRICAS_EXPANSAO, obterPesosExpansao());
 
+    preencherCamposRotas();
+
     const botaoOperacao = document.getElementById("guardarPesosOperacao");
     const botaoExpansao = document.getElementById("guardarPesosExpansao");
+    const botaoRotas = document.getElementById("guardarConfigRotas");
 
     if (botaoOperacao) {
 
-        botaoOperacao.addEventListener("click", () => {
+        botaoOperacao.addEventListener("click", async () => {
 
             const pesos = lerPesosDoFormulario("slidersOperacao", METRICAS_OPERACAO);
 
             guardarPesosOperacao(pesos);
+            await guardarConfigPartilhadaNoBackend({ pesosOperacao: pesos });
             mostrarConfirmacao("confirmacaoOperacao");
+
+            if (typeof atualizarTudo === "function")
+                atualizarTudo();
+
+            if (typeof atualizarPaginaRotas === "function")
+                atualizarPaginaRotas();
+
+        });
+
+    }
+
+    if (botaoExpansao) {
+
+        botaoExpansao.addEventListener("click", async () => {
+
+            const pesos = lerPesosDoFormulario("slidersExpansao", METRICAS_EXPANSAO);
+
+            guardarPesosExpansao(pesos);
+            await guardarConfigPartilhadaNoBackend({ pesosExpansao: pesos });
+            mostrarConfirmacao("confirmacaoExpansao");
 
             if (typeof atualizarTudo === "function")
                 atualizarTudo();
@@ -213,17 +322,39 @@ function iniciarPaginaIndices() {
 
     }
 
-    if (botaoExpansao) {
+    if (botaoRotas) {
 
-        botaoExpansao.addEventListener("click", () => {
+        botaoRotas.addEventListener("click", async () => {
 
-            const pesos = lerPesosDoFormulario("slidersExpansao", METRICAS_EXPANSAO);
+            const patch = {
 
-            guardarPesosExpansao(pesos);
-            mostrarConfirmacao("confirmacaoExpansao");
+                turno: {
+                    inicio: document.getElementById("turnoInicio").value || "07:00",
+                    fim: document.getElementById("turnoFim").value || "20:00"
+                },
 
-            if (typeof atualizarTudo === "function")
-                atualizarTudo();
+                depositos: {
+
+                    porto: {
+                        viaturas: Number(document.getElementById("viaturasPorto").value) || 0
+                    },
+
+                    lisboa: {
+                        viaturas: Number(document.getElementById("viaturasLisboa").value) || 0
+                    }
+
+                },
+
+                emailDestino: document.getElementById("emailDestino").value || ""
+
+            };
+
+            const ok = await guardarConfigPartilhadaNoBackend(patch);
+
+            mostrarConfirmacao("confirmacaoRotas");
+
+            if (ok && typeof atualizarPaginaRotas === "function")
+                atualizarPaginaRotas();
 
         });
 
