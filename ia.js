@@ -128,7 +128,15 @@ function responderIaExpansao(pergunta, oportunidades) {
     if (!oportunidades || !oportunidades.length)
         return "Ainda não há pedidos suficientes fora da operação atual para gerar uma resposta.";
 
-    const ordenados = [...oportunidades].sort((a, b) => (b.score || 0) - (a.score || 0));
+    // O grupo "Sem localização identificada" não é uma zona real —
+    // não faz sentido recomendá-lo como local para reforçar ou abrir
+    // uma nova operação, por isso fica de fora destas respostas
+    const comLocalizacao = oportunidades.filter(o => !o.semLocalizacao);
+
+    if (!comLocalizacao.length)
+        return "Os pedidos fora da operação atual não têm código postal suficiente para identificar zonas concretas.";
+
+    const ordenados = [...comLocalizacao].sort((a, b) => (b.score || 0) - (a.score || 0));
 
     const melhor = ordenados[0];
 
