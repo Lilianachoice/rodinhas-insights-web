@@ -230,6 +230,9 @@ function atualizarPaginaRotas() {
     if (!window.configPartilhada)
         return;
 
+    if (typeof preencherCamposRotas === "function")
+        preencherCamposRotas();
+
     const config = window.configPartilhada;
     const resultado = construirRotasPotenciaisSite();
 
