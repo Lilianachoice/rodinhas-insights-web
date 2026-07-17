@@ -98,6 +98,53 @@ const METRICAS_EXPANSAO = [
 
 ];
 
+const METRICAS_ROTAS = [
+
+    {
+        key: "receita",
+        label: "Receita Mensal",
+        tooltip: "Mede o peso da receita mensal do cluster no índice desta rota.",
+        min: 0, max: 50
+    },
+    {
+        key: "pedidos",
+        label: "Nº de Pedidos",
+        tooltip: "Quanto mais pedidos agregados nesta rota, maior a eficiência.",
+        min: 0, max: 50
+    },
+    {
+        key: "passageiros",
+        label: "Passageiros",
+        tooltip: "Considera o total de passageiros transportados na rota.",
+        min: 0, max: 50
+    },
+    {
+        key: "shared",
+        label: "Shared",
+        tooltip: "Quanto maior a percentagem de pedidos Shared, maior a facilidade de agregação.",
+        min: 0, max: 50
+    },
+    {
+        key: "private",
+        label: "Private (penalização)",
+        tooltip: "Um peso negativo penaliza rotas com muitos pedidos Private.",
+        min: -30, max: 30
+    },
+    {
+        key: "horario",
+        label: "Compatibilidade Horária",
+        tooltip: "Mede o quão próximos são os horários de pickup dos pedidos desta rota.",
+        min: 0, max: 50
+    },
+    {
+        key: "dias",
+        label: "Compatibilidade dos Dias",
+        tooltip: "Mede quantos pedidos da rota partilham os mesmos dias de serviço.",
+        min: 0, max: 50
+    }
+
+];
+
 function construirSliders(containerId, metricas, pesosAtuais) {
 
     const container = document.getElementById(containerId);
@@ -204,6 +251,7 @@ const CONFIG_PARTILHADA_FALLBACK = {
 
     pesosOperacao: { ...PESOS_OPERACAO_DEFAULT },
     pesosExpansao: { ...PESOS_EXPANSAO_DEFAULT },
+    pesosRotas: { ...PESOS_ROTAS_DEFAULT },
 
     regrasOperacionais: {
         capacidade: 7, tempoViatura: 90, pickupKm: 10, dropoffKm: 10, valorMinimo: 0
@@ -373,12 +421,14 @@ function iniciarPaginaIndices() {
 
     construirSliders("slidersOperacao", METRICAS_OPERACAO, obterPesosOperacao());
     construirSliders("slidersExpansao", METRICAS_EXPANSAO, obterPesosExpansao());
+    construirSliders("slidersRotas", METRICAS_ROTAS, obterPesosRotas());
 
     preencherCamposRotas();
     preencherCampoIdsExcluidos();
 
     const botaoOperacao = document.getElementById("guardarPesosOperacao");
     const botaoExpansao = document.getElementById("guardarPesosExpansao");
+    const botaoPesosRotas = document.getElementById("guardarPesosRotas");
     const botaoRotas = document.getElementById("guardarConfigRotas");
     const botaoExcluidos = document.getElementById("guardarIdsExcluidos");
 
@@ -414,6 +464,23 @@ function iniciarPaginaIndices() {
 
             if (typeof atualizarTudo === "function")
                 atualizarTudo();
+
+        });
+
+    }
+
+    if (botaoPesosRotas) {
+
+        botaoPesosRotas.addEventListener("click", async () => {
+
+            const pesos = lerPesosDoFormulario("slidersRotas", METRICAS_ROTAS);
+
+            guardarPesosRotas(pesos);
+            await guardarConfigPartilhadaNoBackend({ pesosRotas: pesos });
+            mostrarConfirmacao("confirmacaoPesosRotas");
+
+            if (typeof atualizarPaginaRotas === "function")
+                atualizarPaginaRotas();
 
         });
 
