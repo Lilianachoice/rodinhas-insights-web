@@ -428,7 +428,6 @@ function iniciarPaginaIndices() {
 
     const botaoOperacao = document.getElementById("guardarPesosOperacao");
     const botaoExpansao = document.getElementById("guardarPesosExpansao");
-    const botaoPesosRotas = document.getElementById("guardarPesosRotas");
     const botaoRotas = document.getElementById("guardarConfigRotas");
     const botaoExcluidos = document.getElementById("guardarIdsExcluidos");
 
@@ -469,29 +468,16 @@ function iniciarPaginaIndices() {
 
     }
 
-    if (botaoPesosRotas) {
-
-        botaoPesosRotas.addEventListener("click", async () => {
-
-            const pesos = lerPesosDoFormulario("slidersRotas", METRICAS_ROTAS);
-
-            guardarPesosRotas(pesos);
-            await guardarConfigPartilhadaNoBackend({ pesosRotas: pesos });
-            mostrarConfirmacao("confirmacaoPesosRotas");
-
-            if (typeof atualizarPaginaRotas === "function")
-                atualizarPaginaRotas();
-
-        });
-
-    }
-
     if (botaoRotas) {
 
         botaoRotas.addEventListener("click", async () => {
 
             const minimoAtivo =
                 document.querySelector('input[name="minimoPedidosAtivo"][value="sim"]').checked;
+
+            const pesosRotas = lerPesosDoFormulario("slidersRotas", METRICAS_ROTAS);
+
+            guardarPesosRotas(pesosRotas);
 
             const patch = {
 
@@ -517,7 +503,9 @@ function iniciarPaginaIndices() {
                 criterioRota: {
                     ativo: minimoAtivo,
                     minPedidos: Number(document.getElementById("minimoPedidosValor").value) || 3
-                }
+                },
+
+                pesosRotas: pesosRotas
 
             };
 
