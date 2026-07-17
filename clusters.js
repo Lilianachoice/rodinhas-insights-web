@@ -709,6 +709,18 @@ const PESOS_EXPANSAO_DEFAULT = {
 
 };
 
+const PESOS_ROTAS_DEFAULT = {
+
+    receita: 20,
+    pedidos: 25,
+    passageiros: 20,
+    shared: 15,
+    private: -10,
+    horario: 25,
+    dias: 15
+
+};
+
 function obterPesosOperacao() {
 
     // Prioridade: configuração partilhada (backend, vinda da Sheet) >
@@ -747,6 +759,24 @@ function obterPesosExpansao() {
 
 }
 
+function obterPesosRotas() {
+
+    if (window.configPartilhada && window.configPartilhada.pesosRotas)
+        return { ...PESOS_ROTAS_DEFAULT, ...window.configPartilhada.pesosRotas };
+
+    try {
+
+        const guardado = localStorage.getItem("pesosRotas");
+
+        if (guardado)
+            return { ...PESOS_ROTAS_DEFAULT, ...JSON.parse(guardado) };
+
+    } catch (e) { }
+
+    return { ...PESOS_ROTAS_DEFAULT };
+
+}
+
 function guardarPesosOperacao(pesos) {
 
     localStorage.setItem("pesosOperacao", JSON.stringify(pesos));
@@ -756,6 +786,12 @@ function guardarPesosOperacao(pesos) {
 function guardarPesosExpansao(pesos) {
 
     localStorage.setItem("pesosExpansao", JSON.stringify(pesos));
+
+}
+
+function guardarPesosRotas(pesos) {
+
+    localStorage.setItem("pesosRotas", JSON.stringify(pesos));
 
 }
 
