@@ -1549,3 +1549,9 @@ Nenhuma oportunidade encontrada.
     cursor:pointer;
     font-weight:500;
 }
+
+.separadorCartao{
+    border:none;
+    border-top:1px solid #eee;
+    margin:26px 0;
+}
