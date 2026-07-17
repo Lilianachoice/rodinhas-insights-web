@@ -220,7 +220,7 @@ function construirRotasPotenciaisSite() {
 
         const clusters = construirClustersDepositoSite(porDeposito[chave], config, chave);
 
-        pontuarClustersRotas(clusters, config.pesosOperacao);
+        pontuarClustersRotas(clusters, obterPesosRotas());
 
         const criterio = config.criterioRota || { ativo: false, minPedidos: 3 };
 
