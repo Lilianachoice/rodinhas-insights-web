@@ -426,6 +426,11 @@ function ligarSlider(idSlider, idTexto, sufixo) {
         atualizarTexto();
         atualizarTudoComDebounce();
 
+        // Se houver um cluster aberto no Detalhe, atualiza também o
+        // nº de Viaturas Necessárias ali mostrado
+        if (typeof clusterSelecionado !== "undefined" && clusterSelecionado)
+            mostrarDetalheCluster(clusterSelecionado);
+
     });
 
 }
