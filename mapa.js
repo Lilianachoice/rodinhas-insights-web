@@ -251,6 +251,42 @@ function formatarHora(hora) {
 
 }
 
+function formatarData(data) {
+
+    if (!data)
+        return "—";
+
+    const d = new Date(data);
+
+    if (isNaN(d.getTime()))
+        return String(data);
+
+    return d.toLocaleDateString("pt-PT");
+
+}
+
+function formatarPassageiros(pedido) {
+
+    const total = Number(pedido["Total Passengers"]) || 0;
+    const criancas = Number(pedido["Total Children"]) || 0;
+    const adultos = Number(pedido["Total Adults"]) || 0;
+    const faixa = pedido["Children Age Range"];
+
+    if (!criancas && !adultos)
+        return total || "—";
+
+    const partes = [];
+
+    if (criancas)
+        partes.push(`${criancas} criança${criancas > 1 ? "s" : ""}${faixa ? " (" + faixa + ")" : ""}`);
+
+    if (adultos)
+        partes.push(`${adultos} adulto${adultos > 1 ? "s" : ""}`);
+
+    return `${total} — ${partes.join(", ")}`;
+
+}
+
 function mostrarDetalheCluster(cluster) {
 
     const detalhe =
@@ -377,6 +413,10 @@ function mostrarDetalheCluster(cluster) {
 <th>Morada Dropoff</th>
 <th>Hora Volta</th>
 <th>Dias</th>
+<th>Data Início</th>
+<th>Data Fim</th>
+<th>Passageiros</th>
+<th>Motivo Rejeição</th>
 <th>Mensalidade</th>
 
 </tr>
@@ -416,6 +456,8 @@ function mostrarDetalheCluster(cluster) {
             ? formatarHora(pedido["Return Pickup Hora"])
             : "—";
 
+        const passageiros = formatarPassageiros(pedido);
+
         html += `
 
 <tr>
@@ -433,6 +475,14 @@ function mostrarDetalheCluster(cluster) {
 <td>${horaVolta}</td>
 
 <td>${dias}</td>
+
+<td>${formatarData(pedido["Start Date"])}</td>
+
+<td>${formatarData(pedido["End Date"])}</td>
+
+<td>${passageiros}</td>
+
+<td>${pedido["Reject Reason"] || "—"}</td>
 
 <td>${(Number(pedido["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €</td>
 
