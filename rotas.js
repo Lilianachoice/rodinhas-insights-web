@@ -378,7 +378,7 @@ function mostrarDetalheRota(indice) {
                 <td>${morada}</td>
                 <td>${moradaDropoff}</td>
                 <td>${horaVolta}</td>
-                <td>${pedido["Total Passengers"] || "-"}</td>
+                <td>${formatarPassageiros(pedido)}</td>
                 <td>${obterDiasPedido(pedido).join(", ") || "—"}</td>
             </tr>
         `;
