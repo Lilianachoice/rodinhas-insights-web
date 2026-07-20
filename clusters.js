@@ -149,7 +149,23 @@ function horaParaMinutos(hora) {
     if (!match)
         return null;
 
-    return Number(match[1]) * 60 + Number(match[2]);
+    let minutos = Number(match[1]) * 60 + Number(match[2]);
+
+    // Correção do efeito "LMT" do Google Sheets: células de hora pura
+    // são guardadas com a data "zero" de 1899-12-30, e para datas tão
+    // antigas o motor de datas usa a Hora Média Local de Lisboa em
+    // vez do fuso horário atual — isso desloca a hora exportada em
+    // 36 minutos para a frente (ex: 13:30 sai como 14:06).
+    if (texto.includes("1899-12-30")) {
+
+        minutos -= 36;
+
+        if (minutos < 0)
+            minutos += 24 * 60;
+
+    }
+
+    return minutos;
 
 }
 
@@ -164,6 +180,16 @@ function obterDiasPedido(pedido) {
         .split(/[,/;]/)
         .map(d => d.trim())
         .filter(Boolean);
+
+}
+
+// Verifica se o pedido tem viagem de volta (Return = true) — quando
+// um cliente é aceite, aceitam-se sempre os dois sentidos (ida e volta)
+function pedidoTemVolta(pedido) {
+
+    const valor = pedido["Return"];
+
+    return valor === true || valor === "TRUE" || valor === "true" || valor === 1 || valor === "1";
 
 }
 
