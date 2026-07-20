@@ -183,6 +183,33 @@ function obterDiasPedido(pedido) {
 
 }
 
+const TRADUCOES_DIAS = {
+
+    "monday": "2ª feira",
+    "tuesday": "3ª feira",
+    "wednesday": "4ª feira",
+    "thursday": "5ª feira",
+    "friday": "6ª feira",
+    "saturday": "Sábado",
+    "sunday": "Domingo"
+
+};
+
+function traduzirDia(dia) {
+
+    if (!dia)
+        return dia;
+
+    return TRADUCOES_DIAS[String(dia).trim().toLowerCase()] || dia;
+
+}
+
+function traduzirDias(dias) {
+
+    return dias.map(traduzirDia).join(", ");
+
+}
+
 // Verifica se o pedido tem viagem de volta (Return = true) — quando
 // um cliente é aceite, aceitam-se sempre os dois sentidos (ida e volta)
 function pedidoTemVolta(pedido) {
@@ -369,9 +396,9 @@ function obterPedidosFiltradosComuns(listaPedidos) {
         // Dias
         if (dia && dia !== "Todos") {
 
-            const diasPedido = obterDiasPedido(p);
+            const diasPedido = obterDiasPedido(p).map(d => d.toLowerCase());
 
-            if (!diasPedido.includes(dia))
+            if (!diasPedido.includes(dia.toLowerCase()))
                 return false;
 
         }
