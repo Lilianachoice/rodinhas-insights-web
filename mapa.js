@@ -251,6 +251,18 @@ function formatarHora(hora) {
 
 }
 
+function obterViaturasNecessarias(cluster) {
+
+    const capacidadeEl = document.getElementById("capacidade");
+
+    const capacidade = capacidadeEl ? Number(capacidadeEl.value) || 7 : 7;
+
+    const passageiros = cluster.totalPassageiros || cluster.pedidos.length;
+
+    return Math.ceil(passageiros / capacidade);
+
+}
+
 function formatarData(data) {
 
     if (!data)
@@ -418,6 +430,22 @@ function mostrarDetalheCluster(cluster) {
         <div class="infoValor">
 
             ${cluster.private}
+
+        </div>
+
+    </div>
+
+    <div class="infoBox">
+
+        <div class="infoTitulo">
+
+            Viaturas Necessárias
+
+        </div>
+
+        <div class="infoValor">
+
+            ${obterViaturasNecessarias(cluster)}
 
         </div>
 
