@@ -375,6 +375,7 @@ function mostrarDetalheCluster(cluster) {
 <th>Hora Pickup</th>
 <th>Morada Pickup</th>
 <th>Morada Dropoff</th>
+<th>Hora Volta</th>
 <th>Dias</th>
 <th>Mensalidade</th>
 
@@ -409,6 +410,12 @@ function mostrarDetalheCluster(cluster) {
 
         const dias = obterDiasPedido(pedido).join(", ") || "—";
 
+        // A volta faz o percurso inverso (Dropoff -> Pickup), só
+        // muda a hora — por isso não repetimos a morada, só a hora
+        const horaVolta = pedidoTemVolta(pedido)
+            ? formatarHora(pedido["Return Pickup Hora"])
+            : "—";
+
         html += `
 
 <tr>
@@ -422,6 +429,8 @@ function mostrarDetalheCluster(cluster) {
 <td>${moradaPickup}</td>
 
 <td>${moradaDropoff}</td>
+
+<td>${horaVolta}</td>
 
 <td>${dias}</td>
 
