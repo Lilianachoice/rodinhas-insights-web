@@ -503,7 +503,7 @@ function mostrarDetalheCluster(cluster) {
             pedido["Dropoff Cidade"]
         ].filter(Boolean).join(", ") || "—";
 
-        const dias = obterDiasPedido(pedido).join(", ") || "—";
+        const dias = traduzirDias(obterDiasPedido(pedido)) || "—";
 
         // A volta faz o percurso inverso (Dropoff -> Pickup), só
         // muda a hora — por isso não repetimos a morada, só a hora
