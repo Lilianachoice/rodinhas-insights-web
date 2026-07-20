@@ -289,7 +289,7 @@ function formatarPassageiros(pedido) {
     const total = Number(pedido["Total Passengers"]) || 0;
     const criancas = Number(pedido["Total Children"]) || 0;
     const adultos = Number(pedido["Total Adults"]) || 0;
-    const faixa = pedido["Children Age Range"];
+    const faixa = pedido["Children Age Range"] || pedido["Children Ages"];
 
     if (!criancas && !adultos)
         return total || "—";
