@@ -289,7 +289,15 @@ function formatarPassageiros(pedido) {
     const total = Number(pedido["Total Passengers"]) || 0;
     const criancas = Number(pedido["Total Children"]) || 0;
     const adultos = Number(pedido["Total Adults"]) || 0;
-    const faixa = pedido["Children Age Range"] || pedido["Children Ages"];
+
+    // A Sheet às vezes interpreta valores tipo "6-10" como se fossem
+    // uma data (ex: 10 de junho) e guarda-os como data em vez de
+    // texto — se isso acontecer, ignoramos o valor em vez de
+    // mostrar uma data/hora sem sentido
+    let faixa = pedido["Children Age Range"] || pedido["Children Ages"];
+
+    if (faixa && /^\d{4}-\d{2}-\d{2}T/.test(String(faixa)))
+        faixa = null;
 
     if (!criancas && !adultos)
         return total || "—";
