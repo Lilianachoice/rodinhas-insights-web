@@ -265,6 +265,25 @@ function formatarData(data) {
 
 }
 
+const TRADUCOES_REJECT_REASON = {
+
+    "UnavailableVehicle": "Viatura Indisponível",
+    "UnavailablePlace": "Localidade Indisponível",
+    "UnviableRoute": "Rota Inviável",
+    "FullRoute": "Rota Lotada",
+    "Other": "Outro"
+
+};
+
+function traduzirMotivoRejeicao(motivo) {
+
+    if (!motivo)
+        return "—";
+
+    return TRADUCOES_REJECT_REASON[motivo] || motivo;
+
+}
+
 function formatarPassageiros(pedido) {
 
     const total = Number(pedido["Total Passengers"]) || 0;
@@ -482,7 +501,7 @@ function mostrarDetalheCluster(cluster) {
 
 <td>${passageiros}</td>
 
-<td>${pedido["Reject Reason"] || "—"}</td>
+<td>${traduzirMotivoRejeicao(pedido["Reject Reason"])}</td>
 
 <td>${(Number(pedido["Monthly Fee"]) || 0).toLocaleString("pt-PT")} €</td>
 
