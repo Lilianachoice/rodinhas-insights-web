@@ -350,6 +350,9 @@ function mostrarDetalheRota(indice) {
                     <th>ID</th>
                     <th>Hora Pickup</th>
                     <th>Morada Pickup</th>
+                    <th>Morada Dropoff</th>
+                    <th>Hora Volta</th>
+                    <th>Passageiros</th>
                     <th>Dias</th>
                 </tr>
             </thead>
@@ -361,11 +364,21 @@ function mostrarDetalheRota(indice) {
         const morada = [pedido["Pickup"], pedido["Pickup CP"], pedido["Pickup Cidade"]]
             .filter(Boolean).join(", ") || "—";
 
+        const moradaDropoff = [pedido["Dropoff"], pedido["Dropoff Cidade"]]
+            .filter(Boolean).join(", ") || "—";
+
+        const horaVolta = pedidoTemVolta(pedido)
+            ? formatarHora(pedido["Return Pickup Hora"])
+            : "—";
+
         html += `
             <tr>
                 <td>${pedido["ID"] || "-"}</td>
                 <td>${formatarHora(pedido["Pickup Hora"])}</td>
                 <td>${morada}</td>
+                <td>${moradaDropoff}</td>
+                <td>${horaVolta}</td>
+                <td>${pedido["Total Passengers"] || "-"}</td>
                 <td>${obterDiasPedido(pedido).join(", ") || "—"}</td>
             </tr>
         `;
