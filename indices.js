@@ -280,7 +280,13 @@ const CONFIG_PARTILHADA_FALLBACK = {
     emailDestino: "",
 
     // IDs de pedidos marcados manualmente como excluídos (ex: testes)
-    idsExcluidos: []
+    idsExcluidos: [],
+
+    kpiViabilidade: {
+        horas: null,
+        pedidosContabilizados: 0,
+        calculadoEm: null
+    }
 
 };
 
