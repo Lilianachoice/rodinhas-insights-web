@@ -1602,7 +1602,8 @@ Nenhuma oportunidade encontrada.
     border-left:1px solid #eee;
 }
 
-.kpiTopoPeriodo input[type="date"]{
+.kpiTopoPeriodo input[type="date"],
+.kpiTopoPeriodo select{
     border:1px solid #ddd;
     border-radius:8px;
     padding:5px 8px;
