@@ -880,6 +880,10 @@ Nenhuma oportunidade encontrada.
 
     display:flex;
 
+    align-items:center;
+
+    flex-wrap:wrap;
+
     gap:12px;
 
     padding:20px 30px 0;
@@ -1554,4 +1558,45 @@ Nenhuma oportunidade encontrada.
     border:none;
     border-top:1px solid #eee;
     margin:26px 0;
+}
+
+/* ===========================
+   KPI JUNTO ÀS ABAS (Tempo de
+   Resposta a Viabilidades)
+=========================== */
+
+.kpiTopoCard{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-left:auto;
+    background:white;
+    border-radius:14px;
+    padding:10px 18px;
+    box-shadow:0 4px 14px rgba(0,0,0,.06);
+}
+
+.kpiTopoIcone{
+    font-size:20px;
+}
+
+.kpiTopoLabel{
+    font-size:11px;
+    color:#888;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+.kpiTopoValor{
+    font-size:20px;
+    font-weight:700;
+    color:#444;
+}
+
+@media (max-width:900px){
+
+    .kpiTopoCard{
+        margin-left:0;
+    }
+
 }
