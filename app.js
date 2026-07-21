@@ -770,6 +770,32 @@ document.querySelectorAll(".iaBotaoExpansao").forEach(botao => {
 // KPI — Tempo de Resposta a Viabilidades
 // ==========================================
 
+// ==========================================
+// KPI — Tempo de Resposta a Viabilidades
+// ==========================================
+
+window.viabilidadesData = [];
+
+async function carregarViabilidades() {
+
+    try {
+
+        const resposta = await fetch(API_URL + "?recurso=viabilidades");
+
+        const dados = await resposta.json();
+
+        window.viabilidadesData = Array.isArray(dados) ? dados : [];
+
+    }
+    catch (erro) {
+
+        console.error("Não foi possível carregar os dados de Viabilidades:", erro);
+        window.viabilidadesData = [];
+
+    }
+
+}
+
 function atualizarKpiViabilidade() {
 
     const el = document.getElementById("insightKpiViabilidade");
@@ -777,9 +803,57 @@ function atualizarKpiViabilidade() {
     if (!el)
         return;
 
-    const kpi = window.configPartilhada && window.configPartilhada.kpiViabilidade;
+    const inicioEl = document.getElementById("kpiPeriodoInicio");
+    const fimEl = document.getElementById("kpiPeriodoFim");
 
-    if (!kpi || kpi.horas === null || kpi.horas === undefined) {
+    const dataInicio = inicioEl && inicioEl.value ? new Date(inicioEl.value + "T00:00:00") : null;
+    const dataFim = fimEl && fimEl.value ? new Date(fimEl.value + "T23:59:59") : null;
+
+    // Sem período escolhido: usa a média global já calculada no
+    // Apps Script (mais rápido, não precisa de reprocessar nada)
+    if (!dataInicio && !dataFim) {
+
+        const kpi = window.configPartilhada && window.configPartilhada.kpiViabilidade;
+
+        if (!kpi || kpi.horas === null || kpi.horas === undefined) {
+
+            el.innerText = "--";
+            el.style.color = "";
+            return;
+
+        }
+
+        el.innerText = `${kpi.horas}h`;
+        el.style.color = kpi.horas <= 48 ? "#2E7D32" : "#c0392b";
+        return;
+
+    }
+
+    // Com período escolhido: recalcula no browser a partir dos
+    // dados por pedido (filtra pela data de decisão — Viability Date
+    // — já que é isso que define "em que mês a equipa respondeu")
+    const registos = (window.viabilidadesData || []).filter(r => {
+
+        const dataDecisao = new Date(r["Viability Date"]);
+
+        if (isNaN(dataDecisao.getTime()))
+            return false;
+
+        if (dataInicio && dataDecisao < dataInicio)
+            return false;
+
+        if (dataFim && dataDecisao > dataFim)
+            return false;
+
+        return true;
+
+    });
+
+    const horasValidas = registos
+        .map(r => Number(r["Horas Uteis"]))
+        .filter(h => !isNaN(h));
+
+    if (!horasValidas.length) {
 
         el.innerText = "--";
         el.style.color = "";
@@ -787,10 +861,38 @@ function atualizarKpiViabilidade() {
 
     }
 
-    el.innerText = `${kpi.horas}h`;
+    const media = horasValidas.reduce((a, b) => a + b, 0) / horasValidas.length;
+    const mediaArredondada = Math.round(media * 10) / 10;
 
-    // Verde dentro do SLA de 48h, vermelho se ultrapassar
-    el.style.color = kpi.horas <= 48 ? "#2E7D32" : "#c0392b";
+    el.innerText = `${mediaArredondada}h`;
+    el.style.color = mediaArredondada <= 48 ? "#2E7D32" : "#c0392b";
+
+}
+
+function ligarSeletorPeriodoKpi() {
+
+    const inicioEl = document.getElementById("kpiPeriodoInicio");
+    const fimEl = document.getElementById("kpiPeriodoFim");
+    const limparEl = document.getElementById("kpiLimparPeriodo");
+
+    if (inicioEl)
+        inicioEl.addEventListener("change", atualizarKpiViabilidade);
+
+    if (fimEl)
+        fimEl.addEventListener("change", atualizarKpiViabilidade);
+
+    if (limparEl) {
+
+        limparEl.addEventListener("click", () => {
+
+            if (inicioEl) inicioEl.value = "";
+            if (fimEl) fimEl.value = "";
+
+            atualizarKpiViabilidade();
+
+        });
+
+    }
 
 }
 
@@ -803,7 +905,12 @@ async function iniciar() {
     // omissão (ver indices.js) em vez de travar aqui.
     await carregarConfigPartilhada();
 
+    ligarSeletorPeriodoKpi();
     atualizarKpiViabilidade();
+
+    // Não bloqueia o arranque — carrega em paralelo, e assim que
+    // chegar, fica disponível para quem escolher um período
+    carregarViabilidades();
 
     try {
 
