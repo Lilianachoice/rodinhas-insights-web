@@ -766,6 +766,34 @@ document.querySelectorAll(".iaBotaoExpansao").forEach(botao => {
 // Arranque
 // ==========================================
 
+// ==========================================
+// KPI — Tempo de Resposta a Viabilidades
+// ==========================================
+
+function atualizarKpiViabilidade() {
+
+    const el = document.getElementById("insightKpiViabilidade");
+
+    if (!el)
+        return;
+
+    const kpi = window.configPartilhada && window.configPartilhada.kpiViabilidade;
+
+    if (!kpi || kpi.horas === null || kpi.horas === undefined) {
+
+        el.innerText = "--";
+        el.style.color = "";
+        return;
+
+    }
+
+    el.innerText = `${kpi.horas}h`;
+
+    // Verde dentro do SLA de 48h, vermelho se ultrapassar
+    el.style.color = kpi.horas <= 48 ? "#2E7D32" : "#c0392b";
+
+}
+
 async function iniciar() {
 
     iniciarMapa();
@@ -774,6 +802,8 @@ async function iniciar() {
     // arrancar — se falhar ou vier mal formada, cai para valores por
     // omissão (ver indices.js) em vez de travar aqui.
     await carregarConfigPartilhada();
+
+    atualizarKpiViabilidade();
 
     try {
 
@@ -895,9 +925,27 @@ function obterOportunidadesExpansao(listaPedidos) {
         // String(...) primeiro: a Sheet por vezes devolve o CP como
         // número (ex: 2691 em vez de "2691-000"), o que fazia esta
         // função rebentar ao chamar .trim() diretamente num número.
-        const cpCompleto = String(p["Pickup CP"] || "").trim();
+        let cpCompleto = String(p["Pickup CP"] || "").trim();
 
-        // Sem CP válido -> não desaparece, entra num grupo "catch-all"
+        // Sem Pickup CP válido -> tenta o Post Code (vem de um campo
+        // diferente no endpoint, útil precisamente para os pedidos
+        // sem morada — dá localização real em vez do "catch-all"
+        let veioDoPostCode = false;
+
+        if (!cpValido(cpCompleto)) {
+
+            const postCode = String(p["Post Code"] || "").trim();
+
+            if (cpValido(postCode)) {
+
+                cpCompleto = postCode;
+                veioDoPostCode = true;
+
+            }
+
+        }
+
+        // Continua sem CP válido nenhum -> grupo "catch-all"
         // (não pode ser localizado num mapa, mas continua a contar
         // nos totais e na lista de pedidos por analisar)
         const cp = cpValido(cpCompleto) ? cpCompleto.substring(0, 4) : "SEM_CP";
@@ -907,7 +955,7 @@ function obterOportunidadesExpansao(listaPedidos) {
             grupos[cp] = {
 
                 cp: cp === "SEM_CP" ? "—" : cp,
-                cidade: cp === "SEM_CP" ? "Sem localização identificada" : (p["Pickup Cidade"] || "-"),
+                cidade: cp === "SEM_CP" ? "Sem localização identificada" : (p["Pickup Cidade"] || (veioDoPostCode ? "" : "-")),
                 pedidos: 0,
                 shared: 0,
                 private: 0,
