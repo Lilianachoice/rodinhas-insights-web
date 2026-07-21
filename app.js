@@ -830,19 +830,18 @@ function atualizarKpiViabilidade() {
     }
 
     // Com período escolhido: recalcula no browser a partir dos
-    // dados por pedido (filtra pela data de decisão — Viability Date
-    // — já que é isso que define "em que mês a equipa respondeu")
+    // dados por pedido, filtrando pela Data Pedido (entrada no BO)
     const registos = (window.viabilidadesData || []).filter(r => {
 
-        const dataDecisao = new Date(r["Viability Date"]);
+        const dataReferencia = new Date(r["Data Pedido"]);
 
-        if (isNaN(dataDecisao.getTime()))
+        if (isNaN(dataReferencia.getTime()))
             return false;
 
-        if (dataInicio && dataDecisao < dataInicio)
+        if (dataInicio && dataReferencia < dataInicio)
             return false;
 
-        if (dataFim && dataDecisao > dataFim)
+        if (dataFim && dataReferencia > dataFim)
             return false;
 
         return true;
