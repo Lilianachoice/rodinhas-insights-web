@@ -286,7 +286,9 @@ const CONFIG_PARTILHADA_FALLBACK = {
         horas: null,
         pedidosContabilizados: 0,
         calculadoEm: null
-    }
+    },
+
+    emailAlertaAveiro: ""
 
 };
 
@@ -431,11 +433,13 @@ function iniciarPaginaIndices() {
 
     preencherCamposRotas();
     preencherCampoIdsExcluidos();
+    preencherCampoEmailAveiro();
 
     const botaoOperacao = document.getElementById("guardarPesosOperacao");
     const botaoExpansao = document.getElementById("guardarPesosExpansao");
     const botaoRotas = document.getElementById("guardarConfigRotas");
     const botaoExcluidos = document.getElementById("guardarIdsExcluidos");
+    const botaoAveiro = document.getElementById("guardarEmailAveiro");
 
     if (botaoOperacao) {
 
@@ -570,6 +574,20 @@ function iniciarPaginaIndices() {
 
     }
 
+    if (botaoAveiro) {
+
+        botaoAveiro.addEventListener("click", async () => {
+
+            const email = document.getElementById("emailAlertaAveiro").value || "";
+
+            const ok = await guardarConfigPartilhadaNoBackend({ emailAlertaAveiro: email });
+
+            mostrarConfirmacao("confirmacaoAveiro");
+
+        });
+
+    }
+
 }
 
 function preencherCampoIdsExcluidos() {
@@ -580,6 +598,17 @@ function preencherCampoIdsExcluidos() {
         return;
 
     campo.value = (window.configPartilhada.idsExcluidos || []).join(", ");
+
+}
+
+function preencherCampoEmailAveiro() {
+
+    const campo = document.getElementById("emailAlertaAveiro");
+
+    if (!campo || !window.configPartilhada)
+        return;
+
+    campo.value = window.configPartilhada.emailAlertaAveiro || "";
 
 }
 
