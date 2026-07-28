@@ -4,7 +4,7 @@
 
 // URL da API Apps Script
 const API_URL =
-    "https://script.google.com/macros/s/AKfycbywFtaswq_fKVl4g1Da7zkv0onaezicBzX2z-KtYjLnDQFWxnRjVPqvTExxq2N9SDGe/exec";
+    "https://script.google.com/macros/s/AKfycbzU-uQ_RpJyUhhszVRX0eL1b84QqzCqkYOBQF_IK-qWwwacoQasSqjwziqcy-nMQ6wr/exec";
 
 let pedidos = [];
 
