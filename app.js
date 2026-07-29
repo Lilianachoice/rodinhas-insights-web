@@ -848,7 +848,13 @@ function atualizarKpiViabilidade() {
 
     });
 
+    // Número("") dá 0, não NaN — por isso é preciso filtrar as
+    // células em branco ANTES de converter para número. Sem isto,
+    // pedidos excluídos (duplicados, "Horas Uteis" em branco de
+    // propósito) eram contados como respostas perfeitas de 0h,
+    // baixando artificialmente a média.
     const horasValidas = registos
+        .filter(r => r["Horas Uteis"] !== "" && r["Horas Uteis"] !== null && r["Horas Uteis"] !== undefined)
         .map(r => Number(r["Horas Uteis"]))
         .filter(h => !isNaN(h));
 
