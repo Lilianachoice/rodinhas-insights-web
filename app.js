@@ -341,12 +341,12 @@ function atualizarTudo() {
 
     atualizarNotaPendentes(pedidosPendentes);
 
-    atualizarInsights(
-        pedidosOperacao,
+    desenharPedidos(
         clusters
     );
 
-    desenharPedidos(
+    atualizarInsights(
+        pedidosOperacao,
         clusters
     );
 
