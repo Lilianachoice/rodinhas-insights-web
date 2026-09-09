@@ -330,6 +330,7 @@ align-items:start;
 .legendaMiniMapa{
 
     display:flex;
+    flex-wrap:wrap;
     gap:14px;
     font-size:12px;
     font-weight:400;
@@ -351,6 +352,25 @@ align-items:start;
     height:10px;
     border-radius:50%;
     display:inline-block;
+
+}
+
+.linhaLegenda{
+
+    width:16px;
+    height:2px;
+    display:inline-block;
+
+}
+
+.numeroSequencia{
+
+    background:transparent !important;
+    border:none !important;
+    box-shadow:none !important;
+    color:#333;
+    font-weight:700;
+    font-size:11px;
 
 }
 
