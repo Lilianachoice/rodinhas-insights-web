@@ -340,6 +340,20 @@ function mostrarDetalheCluster(cluster) {
     const score =
         cluster.score !== undefined ? cluster.score : "--";
 
+    // Ordena pela hora de pickup — pedidos sem hora ficam no fim
+    const pedidosOrdenados = [...cluster.pedidos].sort((a, b) => {
+
+        const horaA = horaParaMinutos(a["Pickup Hora"]);
+        const horaB = horaParaMinutos(b["Pickup Hora"]);
+
+        if (horaA === null && horaB === null) return 0;
+        if (horaA === null) return 1;
+        if (horaB === null) return -1;
+
+        return horaA - horaB;
+
+    });
+
     let html = `
 
 <div class="clusterHeader">
@@ -482,7 +496,7 @@ function mostrarDetalheCluster(cluster) {
 
 `;
 
-    cluster.pedidos.forEach(pedido => {
+    pedidosOrdenados.forEach(pedido => {
 
         const tipo =
 
@@ -555,9 +569,119 @@ function mostrarDetalheCluster(cluster) {
 
 </div>
 
+<div class="miniMapaClusterWrapper">
+
+    <h4>
+        Mapa do cluster
+        <span class="legendaMiniMapa">
+            <span><span class="pontoLegenda" style="background:#F5C518;"></span> Pickup</span>
+            <span><span class="pontoLegenda" style="background:#E03131;"></span> Dropoff</span>
+        </span>
+    </h4>
+
+    <div id="miniMapaCluster"></div>
+
+</div>
+
 `;
 
     detalhe.innerHTML = html;
+
+    renderizarMiniMapaCluster(cluster);
+
+}
+
+// ==========================================
+// MINI-MAPA DO CLUSTER (Pickup a amarelo, Dropoff a vermelho)
+// ==========================================
+
+let miniMapaClusterInstancia = null;
+
+function renderizarMiniMapaCluster(cluster) {
+
+    const container = document.getElementById("miniMapaCluster");
+
+    if (!container)
+        return;
+
+    // Leaflet não permite reinicializar o mesmo elemento — destrói a
+    // instância anterior antes de criar uma nova
+    if (miniMapaClusterInstancia) {
+
+        miniMapaClusterInstancia.remove();
+        miniMapaClusterInstancia = null;
+
+    }
+
+    miniMapaClusterInstancia = L.map("miniMapaCluster", {
+        scrollWheelZoom: false
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap"
+    }).addTo(miniMapaClusterInstancia);
+
+    const pontos = [];
+
+    cluster.pedidos.forEach(pedido => {
+
+        const pickupLat = paraNumero(pedido["Pickup Lat"]);
+        const pickupLng = paraNumero(pedido["Pickup Lng"]);
+        const dropoffLat = paraNumero(pedido["Dropoff Lat"]);
+        const dropoffLng = paraNumero(pedido["Dropoff Lng"]);
+
+        const moradaPickup = [pedido["Pickup"], pedido["Pickup Cidade"]]
+            .filter(Boolean).join(", ") || "Pickup";
+
+        const moradaDropoff = [pedido["Dropoff"], pedido["Dropoff Cidade"]]
+            .filter(Boolean).join(", ") || "Dropoff";
+
+        if (pickupLat && pickupLng) {
+
+            L.circleMarker([pickupLat, pickupLng], {
+                radius: 7,
+                color: "#B8860B",
+                fillColor: "#F5C518",
+                fillOpacity: 0.9,
+                weight: 1.5
+            })
+            .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Pickup — ${moradaPickup}`)
+            .addTo(miniMapaClusterInstancia);
+
+            pontos.push([pickupLat, pickupLng]);
+
+        }
+
+        if (dropoffLat && dropoffLng) {
+
+            L.circleMarker([dropoffLat, dropoffLng], {
+                radius: 7,
+                color: "#9C1F1F",
+                fillColor: "#E03131",
+                fillOpacity: 0.9,
+                weight: 1.5
+            })
+            .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Dropoff — ${moradaDropoff}`)
+            .addTo(miniMapaClusterInstancia);
+
+            pontos.push([dropoffLat, dropoffLng]);
+
+        }
+
+    });
+
+    if (pontos.length) {
+
+        miniMapaClusterInstancia.fitBounds(pontos, { padding: [30, 30] });
+
+    }
+    else {
+
+        // Sem coordenadas nenhumas — mostra Portugal genérico em vez
+        // de um mapa em branco
+        miniMapaClusterInstancia.setView([39.5, -8], 6);
+
+    }
 
 }
 
