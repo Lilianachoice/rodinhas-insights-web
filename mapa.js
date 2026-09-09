@@ -576,6 +576,8 @@ function mostrarDetalheCluster(cluster) {
         <span class="legendaMiniMapa">
             <span><span class="pontoLegenda" style="background:#F5C518;"></span> Pickup</span>
             <span><span class="pontoLegenda" style="background:#E03131;"></span> Dropoff</span>
+            <span><span class="linhaLegenda" style="background:#999;"></span> Pickup → Dropoff (mesma viagem)</span>
+            <span><span class="linhaLegenda" style="background:#3B5BDB;"></span> Sequência sugerida (por hora)</span>
         </span>
     </h4>
 
@@ -623,7 +625,28 @@ function renderizarMiniMapaCluster(cluster) {
 
     const pontos = [];
 
-    cluster.pedidos.forEach(pedido => {
+    // Ordena os pedidos pela hora de pickup, para conseguir numerar
+    // a sequência sugerida da rota (1º, 2º, 3º...) — como não temos
+    // a hora real de chegada ao dropoff, cada dropoff assume o
+    // número a seguir ao do seu próprio pickup. É uma aproximação
+    // simples à sequência real, não um cálculo de rota otimizado.
+    const pedidosOrdenados = [...cluster.pedidos].sort((a, b) => {
+
+        const horaA = horaParaMinutos(a["Pickup Hora"]);
+        const horaB = horaParaMinutos(b["Pickup Hora"]);
+
+        if (horaA === null && horaB === null) return 0;
+        if (horaA === null) return 1;
+        if (horaB === null) return -1;
+
+        return horaA - horaB;
+
+    });
+
+    const pontosRota = []; // sequência para a linha de rota sugerida
+    let sequencia = 0;
+
+    pedidosOrdenados.forEach(pedido => {
 
         const pickupLat = paraNumero(pedido["Pickup Lat"]);
         const pickupLng = paraNumero(pedido["Pickup Lng"]);
@@ -636,39 +659,77 @@ function renderizarMiniMapaCluster(cluster) {
         const moradaDropoff = [pedido["Dropoff"], pedido["Dropoff Cidade"]]
             .filter(Boolean).join(", ") || "Dropoff";
 
-        if (pickupLat && pickupLng) {
+        const horaPickup = formatarHora(pedido["Pickup Hora"]);
+
+        const temPickup = pickupLat && pickupLng;
+        const temDropoff = dropoffLat && dropoffLng;
+
+        if (temPickup) {
+
+            sequencia++;
 
             L.circleMarker([pickupLat, pickupLng], {
-                radius: 7,
+                radius: 8,
                 color: "#B8860B",
                 fillColor: "#F5C518",
-                fillOpacity: 0.9,
+                fillOpacity: 0.95,
                 weight: 1.5
             })
-            .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Pickup — ${moradaPickup}`)
+            .bindTooltip(String(sequencia), { permanent: true, direction: "center", className: "numeroSequencia" })
+            .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Pickup (${horaPickup}) — ${moradaPickup}`)
             .addTo(miniMapaClusterInstancia);
 
             pontos.push([pickupLat, pickupLng]);
+            pontosRota.push([pickupLat, pickupLng]);
 
         }
 
-        if (dropoffLat && dropoffLng) {
+        if (temDropoff) {
+
+            sequencia++;
 
             L.circleMarker([dropoffLat, dropoffLng], {
-                radius: 7,
+                radius: 8,
                 color: "#9C1F1F",
                 fillColor: "#E03131",
-                fillOpacity: 0.9,
+                fillOpacity: 0.95,
                 weight: 1.5
             })
+            .bindTooltip(String(sequencia), { permanent: true, direction: "center", className: "numeroSequencia" })
             .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Dropoff — ${moradaDropoff}`)
             .addTo(miniMapaClusterInstancia);
 
             pontos.push([dropoffLat, dropoffLng]);
+            pontosRota.push([dropoffLat, dropoffLng]);
+
+        }
+
+        // Linha fina a ligar o pickup ao dropoff DESTE pedido — para
+        // ficar claro que bolas pertencem à mesma viagem
+        if (temPickup && temDropoff) {
+
+            L.polyline(
+                [[pickupLat, pickupLng], [dropoffLat, dropoffLng]],
+                { color: "#999", weight: 1.5, dashArray: "4,5", opacity: 0.7 }
+            ).addTo(miniMapaClusterInstancia);
 
         }
 
     });
+
+    // Linha de rota sugerida — liga todos os pontos pela ordem da
+    // sequência (hora de pickup). É uma aproximação simples, não um
+    // cálculo real de rota otimizada (não considera distância nem
+    // sentido das ruas)
+    if (pontosRota.length > 1) {
+
+        L.polyline(pontosRota, {
+            color: "#3B5BDB",
+            weight: 2.5,
+            opacity: 0.55
+        }).addTo(miniMapaClusterInstancia);
+
+    }
 
     if (pontos.length) {
 
@@ -696,6 +757,14 @@ function mostrarCluster(id) {
 
     if (!marcador)
         return;
+
+    // Garante que o mapa grande fica visível no ecrã antes de voar
+    // até lá — sem isto, quem clica na lista de Top Oportunidades
+    // não vê nada acontecer se o mapa estiver fora da vista atual
+    const mapaEl = document.getElementById("map");
+
+    if (mapaEl)
+        mapaEl.scrollIntoView({ behavior: "smooth", block: "center" });
 
     mapa.flyTo(
 
