@@ -239,6 +239,68 @@ function atualizarInsights(listaPedidos, clusters) {
 
     }
 
+    renderizarTopOportunidades(clusters);
+
+}
+
+// ==========================================
+// TOP OPORTUNIDADES — lista de todos os clusters, ordenada pelo
+// Índice de Oportunidade, para não ser preciso procurar no mapa
+// ==========================================
+
+function renderizarTopOportunidades(clusters) {
+
+    const container = document.getElementById("listaTopOportunidades");
+
+    if (!container)
+        return;
+
+    if (!clusters.length) {
+
+        container.innerHTML = `<div class="clusterVazio" style="padding:10px 0;">Sem clusters para o filtro atual.</div>`;
+        return;
+
+    }
+
+    const ordenados = [...clusters].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+    container.innerHTML = ordenados.map((cluster, i) => {
+
+        const cidade = cluster.pedidos[0]["Pickup Cidade"] || "Sem cidade";
+
+        return `
+
+<div class="itemTopOportunidade" data-cluster-id="${cluster.id}">
+
+    <div class="rank">${i + 1}</div>
+
+    <div class="infoTopo">
+
+        <div class="cidadeTopo">${cidade}</div>
+        <div class="metaTopo">${cluster.pedidos.length} pedidos • ${cluster.totalPassageiros || cluster.pedidos.length} passageiros</div>
+
+    </div>
+
+    <div class="scoreTopo">${cluster.score}</div>
+
+</div>
+
+`;
+
+    }).join("");
+
+    container.querySelectorAll(".itemTopOportunidade").forEach(item => {
+
+        item.addEventListener("click", () => {
+
+            const id = Number(item.getAttribute("data-cluster-id"));
+
+            mostrarCluster(id);
+
+        });
+
+    });
+
 }
 
 // ==========================================
