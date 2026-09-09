@@ -137,6 +137,14 @@
 
 <div id="paginaOperacao">
 
+<p class="descIndice" style="margin-bottom:14px;">
+
+    Todos os pedidos <b>não viáveis</b> com morada válida — vista geográfica bruta, agrupada
+    por proximidade, sem depósito nem restrição de turno atribuída. Para veres esses mesmos
+    pedidos organizados como rotas reais e prontas a avançar, usa a aba "Potenciais Rotas".
+
+</p>
+
 <div class="barraFiltrosData">
 
     <div class="filtroDataItem">
@@ -436,6 +444,19 @@
 
     </div>
 
+    <div class="topOportunidadesBox">
+
+        <h3>📍 Top Oportunidades</h3>
+
+        <p class="descIndice">
+            Todos os clusters ordenados pelo Índice de Oportunidade — clica para veres o
+            detalhe, sem teres de procurar no mapa.
+        </p>
+
+        <div id="listaTopOportunidades" class="listaTopOportunidades"></div>
+
+    </div>
+
     <!-- ========================= -->
     <!-- IA — OPERAÇÃO ATUAL -->
     <!-- ========================= -->
@@ -480,13 +501,14 @@
 
         <div class="clusterVazio">
 
-            Selecione um cluster no mapa ou clique na Melhor Oportunidade para visualizar todos os pedidos.
+            Selecione um cluster no mapa, ou na lista de Top Oportunidades, para visualizar todos os pedidos.
 
         </div>
 
     </div>
 
 </section>
+
 
 </div>
 
@@ -670,9 +692,10 @@
 
         <p class="descIndice">
 
-            Pedidos não viáveis, com morada dentro da área de atuação, agrupados em
-            possíveis rotas a partir do depósito mais próximo — a mesma lógica usada
-            na notificação diária por email.
+            Os <b>mesmos pedidos não viáveis</b> da Operação Atual — mas aqui organizados
+            como rotas reais, atribuídos ao depósito mais próximo (Porto ou Lisboa) e a
+            respeitar turnos e nº de viaturas disponíveis. Pensado para decidir se vale a
+            pena avançar já com uma rota nova, não só para ver onde há pedidos.
 
         </p>
 
