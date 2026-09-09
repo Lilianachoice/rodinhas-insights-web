@@ -203,6 +203,166 @@ align-items:start;
 
 }
 
+/* ========================= */
+/* TOP OPORTUNIDADES */
+/* ========================= */
+
+.topOportunidadesBox{
+
+    background:white;
+    border:1px solid #ECECEC;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:18px;
+
+}
+
+.topOportunidadesBox h3{
+
+    margin:0 0 4px 0;
+    font-size:15px;
+
+}
+
+.listaTopOportunidades{
+
+    max-height:340px;
+    overflow-y:auto;
+    margin-top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+}
+
+.itemTopOportunidade{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:10px 12px;
+
+    border:1px solid #ECECEC;
+    border-radius:12px;
+
+    cursor:pointer;
+    transition:.2s;
+
+}
+
+.itemTopOportunidade:hover{
+
+    background:#F7F9FC;
+    border-color:#D8E0F0;
+
+}
+
+.itemTopOportunidade .rank{
+
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:#EEF2FB;
+    color:#3B5BDB;
+    font-weight:700;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+
+}
+
+.itemTopOportunidade .infoTopo{
+
+    flex:1;
+    min-width:0;
+
+}
+
+.itemTopOportunidade .cidadeTopo{
+
+    font-weight:600;
+    font-size:14px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+}
+
+.itemTopOportunidade .metaTopo{
+
+    font-size:12px;
+    color:#888;
+
+}
+
+.itemTopOportunidade .scoreTopo{
+
+    font-weight:700;
+    font-size:13px;
+    color:#3B5BDB;
+    flex-shrink:0;
+
+}
+
+/* ========================= */
+/* MINI-MAPA DO CLUSTER */
+/* ========================= */
+
+.miniMapaClusterWrapper{
+
+    margin-top:18px;
+
+}
+
+.miniMapaClusterWrapper h4{
+
+    margin:0 0 8px 0;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+}
+
+.legendaMiniMapa{
+
+    display:flex;
+    gap:14px;
+    font-size:12px;
+    font-weight:400;
+    color:#666;
+
+}
+
+.legendaMiniMapa span{
+
+    display:flex;
+    align-items:center;
+    gap:5px;
+
+}
+
+.pontoLegenda{
+
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    display:inline-block;
+
+}
+
+#miniMapaCluster{
+
+    width:100%;
+    height:340px;
+    border-radius:14px;
+    border:1px solid #ECECEC;
+
+}
+
 .icone{
 
     width:52px;
