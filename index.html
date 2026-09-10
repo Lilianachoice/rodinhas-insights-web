@@ -736,102 +736,6 @@
 
         </div>
 
-        <hr class="separadorCartao" style="margin:32px 0;">
-
-        <h2>📧 Pré-visualização do Email Diário</h2>
-
-        <p class="descIndice">
-
-            Isto abaixo é diferente do que está acima — mostra os pedidos já <b>Não Viáveis</b>
-            organizados por depósito e turno, exatamente como saem no email automático diário.
-            Serve para configurar esse email, não para ver os pedidos ainda por decidir.
-
-        </p>
-
-        <div class="cartaoIndice">
-
-            <h3>🚐 Turnos, Depósitos e Notificações</h3>
-
-
-            <p class="descIndice">
-
-                Usado nesta página e na notificação diária por email. Estes valores
-                são partilhados com o Apps Script.
-
-            </p>
-
-            <div class="linhasConfigRotas">
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Início do turno</span></div>
-                    <input type="time" id="turnoInicio">
-                </div>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Fim do turno</span></div>
-                    <input type="time" id="turnoFim">
-                </div>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Viaturas — Porto (Lake Towers)</span></div>
-                    <input type="number" id="viaturasPorto" min="0" max="10">
-                </div>
-
-                <div class="linhaSlider">
-                    <div class="labelSlider"><span>Viaturas — Lisboa (Prior Velho)</span></div>
-                    <input type="number" id="viaturasLisboa" min="0" max="10">
-                </div>
-
-                <div class="linhaSlider linhaSliderLarga">
-                    <div class="labelSlider"><span>Email(s) para notificações</span></div>
-                    <input type="text" id="emailDestino" placeholder="nome@rodinhas.pt, outro@rodinhas.pt">
-                </div>
-
-                <div class="linhaSlider">
-
-                    <div class="labelSlider"><span>Mínimo de pedidos por rota?</span></div>
-
-                    <div class="opcaoSimNao">
-
-                        <label>
-                            <input type="radio" name="minimoPedidosAtivo" value="sim">
-                            Sim
-                        </label>
-
-                        <label>
-                            <input type="radio" name="minimoPedidosAtivo" value="nao" checked>
-                            Não
-                        </label>
-
-                    </div>
-
-                </div>
-
-                <div class="linhaSlider" id="linhaMinimoPedidosValor" style="display:none;">
-                    <div class="labelSlider"><span>Quantos pedidos, no mínimo</span></div>
-                    <input type="number" id="minimoPedidosValor" min="1" max="20" value="3">
-                </div>
-
-            </div>
-
-            <button id="guardarConfigRotas" class="botaoGuardar">
-                Guardar
-            </button>
-
-            <span id="confirmacaoRotas" class="confirmacaoGuardar"></span>
-
-        </div>
-
-        <div class="depositosGrid" id="depositosGrid">
-
-            <!-- Cartões de depósito (Porto / Lisboa) gerados por rotas.js -->
-
-        </div>
-
-        <div id="rotasPotenciaisLista"></div>
-
-        <div id="detalheRota" class="clusterDetalhe" style="display:none;"></div>
-
     </section>
 
 </div>
@@ -908,6 +812,80 @@
                 </button>
 
                 <span id="confirmacaoPesosRotas" class="confirmacaoGuardar"></span>
+
+            </div>
+
+            <div class="cartaoIndice">
+
+                <h3>🚐 Turnos, Depósitos e Notificações</h3>
+
+                <p class="descIndice">
+
+                    Usado no email diário automático de rotas potenciais (pedidos já
+                    Não Viáveis, organizados por depósito). Estes valores são
+                    partilhados com o Apps Script.
+
+                </p>
+
+                <div class="linhasConfigRotas">
+
+                    <div class="linhaSlider">
+                        <div class="labelSlider"><span>Início do turno</span></div>
+                        <input type="time" id="turnoInicio">
+                    </div>
+
+                    <div class="linhaSlider">
+                        <div class="labelSlider"><span>Fim do turno</span></div>
+                        <input type="time" id="turnoFim">
+                    </div>
+
+                    <div class="linhaSlider">
+                        <div class="labelSlider"><span>Viaturas — Porto (Lake Towers)</span></div>
+                        <input type="number" id="viaturasPorto" min="0" max="10">
+                    </div>
+
+                    <div class="linhaSlider">
+                        <div class="labelSlider"><span>Viaturas — Lisboa (Prior Velho)</span></div>
+                        <input type="number" id="viaturasLisboa" min="0" max="10">
+                    </div>
+
+                    <div class="linhaSlider linhaSliderLarga">
+                        <div class="labelSlider"><span>Email(s) para notificações</span></div>
+                        <input type="text" id="emailDestino" placeholder="nome@rodinhas.pt, outro@rodinhas.pt">
+                    </div>
+
+                    <div class="linhaSlider">
+
+                        <div class="labelSlider"><span>Mínimo de pedidos por rota?</span></div>
+
+                        <div class="opcaoSimNao">
+
+                            <label>
+                                <input type="radio" name="minimoPedidosAtivo" value="sim">
+                                Sim
+                            </label>
+
+                            <label>
+                                <input type="radio" name="minimoPedidosAtivo" value="nao" checked>
+                                Não
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="linhaSlider" id="linhaMinimoPedidosValor" style="display:none;">
+                        <div class="labelSlider"><span>Quantos pedidos, no mínimo</span></div>
+                        <input type="number" id="minimoPedidosValor" min="1" max="20" value="3">
+                    </div>
+
+                </div>
+
+                <button id="guardarConfigRotas" class="botaoGuardar">
+                    Guardar
+                </button>
+
+                <span id="confirmacaoRotas" class="confirmacaoGuardar"></span>
 
             </div>
 
