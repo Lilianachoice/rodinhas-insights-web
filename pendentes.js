@@ -6,28 +6,17 @@
 // padrões (ex: 3 pedidos parecidos para a mesma escola) antes de os
 // avaliar um a um.
 
-let mapaPendentes;
-let marcadoresPendentes;
-const marcadoresClustersPendentes = {};
+// ==========================================
+// VIABILIDADES PENDENTES (lista de clusters)
+// ==========================================
+// Pedidos ainda sem NENHUMA decisão de viabilidade — para ajudar a
+// ver padrões (ex: 3 pedidos parecidos para a mesma escola) antes
+// de os avaliar um a um. Sem mapa grande — só a lista de clusters,
+// que abre o detalhe (tabela + mini-mapa) ao clicar.
+
 let clustersAtuaisPendentes = [];
 let melhorClusterPendente = null;
 let miniMapaClusterPendenteInstancia = null;
-
-function iniciarMapaPendentes() {
-
-    if (mapaPendentes)
-        return; // já iniciado
-
-    mapaPendentes = L.map("mapPendentes").setView([39.6, -8.0], 7);
-
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        { maxZoom: 19, attribution: "© OpenStreetMap" }
-    ).addTo(mapaPendentes);
-
-    marcadoresPendentes = L.layerGroup().addTo(mapaPendentes);
-
-}
 
 // ==========================================
 // CARREGAR DADOS (endpoint próprio, pedidos pendentes)
@@ -61,8 +50,6 @@ async function carregarPedidosPendentes() {
 
 function atualizarPaginaPendentes() {
 
-    iniciarMapaPendentes();
-
     // Reaproveita os mesmos filtros comuns (Shared/Private, valor
     // mínimo, zona, cidade, dias, ano, excluídos) e os filtros de
     // mês próprios desta página
@@ -76,66 +63,11 @@ function atualizarPaginaPendentes() {
 
     const clusters = criarClusters(pedidosComMapa, obterPesosRotas());
 
-    desenharPedidosPendentes(clusters);
-    atualizarInsightsPendentes(pedidos, clusters);
-
-}
-
-// ==========================================
-// DESENHAR CLUSTERS NO MAPA
-// ==========================================
-
-function desenharPedidosPendentes(clusters) {
-
     clustersAtuaisPendentes = clusters;
 
-    marcadoresPendentes.clearLayers();
+    clusters.forEach((cluster, indice) => { cluster.id = indice; });
 
-    Object.keys(marcadoresClustersPendentes).forEach(id => {
-        delete marcadoresClustersPendentes[id];
-    });
-
-    clusters.forEach((cluster, indice) => {
-
-        cluster.id = indice;
-
-        let cor = "#8E5EDB"; // roxo — para diferenciar visualmente da Operação Atual
-
-        if (cluster.shared > 0 && cluster.private === 0)
-            cor = "#F4C400";
-
-        if (cluster.private > 0 && cluster.shared === 0)
-            cor = "#444444";
-
-        const total = cluster.shared + cluster.private;
-
-        const marcador = L.circleMarker(
-            [cluster.lat, cluster.lng],
-            {
-                radius: 10 + Math.min(total, 10),
-                color: cor,
-                fillColor: cor,
-                fillOpacity: 0.85,
-                weight: 2
-            }
-        ).addTo(marcadoresPendentes);
-
-        marcador.bindTooltip(String(total), {
-            permanent: true, direction: "center", className: "clusterLabel"
-        });
-
-        marcador.bindPopup(
-            `<b>${cluster.pedidos[0]["Pickup Cidade"] || "Sem cidade"}</b><br>
-            ${total} pedidos pendentes • Índice ${cluster.score}`
-        );
-
-        marcador.on("click", () => {
-            mostrarDetalheClusterPendente(cluster);
-        });
-
-        marcadoresClustersPendentes[cluster.id] = marcador;
-
-    });
+    atualizarInsightsPendentes(pedidos, clusters);
 
 }
 
@@ -201,24 +133,28 @@ function renderizarTopOportunidadesPendentes(clusters) {
 
     const ordenados = [...clusters].sort((a, b) => (b.score || 0) - (a.score || 0));
 
-    container.innerHTML = ordenados.map((cluster, i) => {
+    container.innerHTML = ordenados.map(cluster => {
 
         const cidade = cluster.pedidos[0]["Pickup Cidade"] || "Sem cidade";
 
         return `
-<div class="itemTopOportunidade" data-cluster-id="${cluster.id}">
-    <div class="rank">${i + 1}</div>
-    <div class="infoTopo">
-        <div class="cidadeTopo">${cidade}</div>
-        <div class="metaTopo">${cluster.pedidos.length} pedidos • ${cluster.totalPassageiros || cluster.pedidos.length} passageiros</div>
+<div class="clusterPendenteCard" data-cluster-id="${cluster.id}">
+    <div class="clusterPendenteHeader">
+        <div>
+            <div class="clusterPendenteTitulo">${cidade}</div>
+            <div class="clusterPendenteStats">
+                ${cluster.pedidos.length} pedidos • ${cluster.totalPassageiros || cluster.pedidos.length} passageiros •
+                ${cluster.receita.toLocaleString("pt-PT")} € / mês
+            </div>
+        </div>
+        <div class="badgeScore">${cluster.score}</div>
     </div>
-    <div class="scoreTopo">${cluster.score}</div>
 </div>
 `;
 
     }).join("");
 
-    container.querySelectorAll(".itemTopOportunidade").forEach(item => {
+    container.querySelectorAll(".clusterPendenteCard").forEach(item => {
 
         item.addEventListener("click", () => {
 
@@ -255,24 +191,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function mostrarClusterPendente(id) {
 
-    const marcador = marcadoresClustersPendentes[id];
-
-    if (!marcador)
-        return;
-
-    const mapaEl = document.getElementById("mapPendentes");
-
-    if (mapaEl)
-        mapaEl.scrollIntoView({ behavior: "smooth", block: "center" });
-
-    mapaPendentes.flyTo(marcador.getLatLng(), 11, { animate: true, duration: 1.2 });
-
-    setTimeout(() => { marcador.openPopup(); }, 900);
-
     const cluster = clustersAtuaisPendentes.find(c => c.id === id);
 
-    if (cluster)
-        mostrarDetalheClusterPendente(cluster);
+    if (!cluster)
+        return;
+
+    mostrarDetalheClusterPendente(cluster);
+
+    const detalheEl = document.getElementById("detalheClusterPendente");
+
+    if (detalheEl)
+        setTimeout(() => detalheEl.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
 
 }
 
