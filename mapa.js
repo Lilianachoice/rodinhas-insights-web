@@ -263,15 +263,35 @@ function descreverHorario(pedido) {
     if (hora === "—")
         return "—";
 
-    const direcao = String(pedido["Direction"] || "").toLowerCase();
+    return `${hora}${sufixoDirecao(pedido["Direction"])}`;
+
+}
+
+// Mesma lógica, mas para a hora de volta (tarde) — usa o campo
+// "Return Direction" (a direção da 2ª perna da viagem, que pode ser
+// diferente da direção da ida)
+function descreverHorarioVolta(pedido) {
+
+    const hora = formatarHora(pedido["Return Pickup Hora"]);
+
+    if (hora === "—")
+        return "—";
+
+    return `${hora}${sufixoDirecao(pedido["Return Direction"])}`;
+
+}
+
+function sufixoDirecao(valorDirection) {
+
+    const direcao = String(valorDirection || "").toLowerCase();
 
     if (direcao === "to")
-        return `${hora} (chegada à escola)`;
+        return " (chegada à escola)";
 
     if (direcao === "from")
-        return `${hora} (saída da escola)`;
+        return " (saída da escola)";
 
-    return hora;
+    return "";
 
 }
 
@@ -546,7 +566,7 @@ function mostrarDetalheCluster(cluster) {
         // A volta faz o percurso inverso (Dropoff -> Pickup), só
         // muda a hora — por isso não repetimos a morada, só a hora
         const horaVolta = pedidoTemVolta(pedido)
-            ? formatarHora(pedido["Return Pickup Hora"])
+            ? descreverHorarioVolta(pedido)
             : "—";
 
         const passageiros = formatarPassageiros(pedido);
@@ -601,7 +621,6 @@ function mostrarDetalheCluster(cluster) {
             <span><span class="pontoLegenda" style="background:#F5C518;"></span> Pickup</span>
             <span><span class="pontoLegenda" style="background:#E03131;"></span> Dropoff</span>
             <span><span class="linhaLegenda" style="background:#999;"></span> Pickup → Dropoff (mesma viagem)</span>
-            <span><span class="linhaLegenda" style="background:#3B5BDB;"></span> Sequência sugerida (por hora)</span>
         </span>
     </h4>
 
@@ -640,7 +659,7 @@ function renderizarMiniMapaCluster(cluster) {
     }
 
     miniMapaClusterInstancia = L.map("miniMapaCluster", {
-        scrollWheelZoom: false
+        scrollWheelZoom: true
     });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -667,10 +686,11 @@ function renderizarMiniMapaCluster(cluster) {
 
     });
 
-    const pontosRota = []; // sequência para a linha de rota sugerida
-    let sequencia = 0;
+    let indicePedido = 0;
 
     pedidosOrdenados.forEach(pedido => {
+
+        indicePedido++;
 
         const pickupLat = paraNumero(pedido["Pickup Lat"]);
         const pickupLng = paraNumero(pedido["Pickup Lng"]);
@@ -688,43 +708,41 @@ function renderizarMiniMapaCluster(cluster) {
         const temPickup = pickupLat && pickupLng;
         const temDropoff = dropoffLat && dropoffLng;
 
+        // O pickup e o dropoff DO MESMO pedido partilham o mesmo
+        // número (em vez de uma contagem contínua 1,2,3,4...) — mais
+        // fácil de ver quais bolas pertencem à mesma viagem, lendo
+        // em conjunto com a linha cinza que os liga
         if (temPickup) {
 
-            sequencia++;
-
             L.circleMarker([pickupLat, pickupLng], {
-                radius: 8,
+                radius: 9,
                 color: "#B8860B",
                 fillColor: "#F5C518",
                 fillOpacity: 0.95,
                 weight: 1.5
             })
-            .bindTooltip(String(sequencia), { permanent: true, direction: "center", className: "numeroSequencia" })
+            .bindTooltip(String(indicePedido), { permanent: true, direction: "center", className: "numeroSequencia" })
             .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Pickup (${horaPickup}) — ${moradaPickup}`)
             .addTo(miniMapaClusterInstancia);
 
             pontos.push([pickupLat, pickupLng]);
-            pontosRota.push([pickupLat, pickupLng]);
 
         }
 
         if (temDropoff) {
 
-            sequencia++;
-
             L.circleMarker([dropoffLat, dropoffLng], {
-                radius: 8,
+                radius: 9,
                 color: "#9C1F1F",
                 fillColor: "#E03131",
                 fillOpacity: 0.95,
                 weight: 1.5
             })
-            .bindTooltip(String(sequencia), { permanent: true, direction: "center", className: "numeroSequencia" })
+            .bindTooltip(String(indicePedido), { permanent: true, direction: "center", className: "numeroSequenciaClaro" })
             .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Dropoff — ${moradaDropoff}`)
             .addTo(miniMapaClusterInstancia);
 
             pontos.push([dropoffLat, dropoffLng]);
-            pontosRota.push([dropoffLat, dropoffLng]);
 
         }
 
@@ -740,20 +758,6 @@ function renderizarMiniMapaCluster(cluster) {
         }
 
     });
-
-    // Linha de rota sugerida — liga todos os pontos pela ordem da
-    // sequência (hora de pickup). É uma aproximação simples, não um
-    // cálculo real de rota otimizada (não considera distância nem
-    // sentido das ruas)
-    if (pontosRota.length > 1) {
-
-        L.polyline(pontosRota, {
-            color: "#3B5BDB",
-            weight: 2.5,
-            opacity: 0.55
-        }).addTo(miniMapaClusterInstancia);
-
-    }
 
     if (pontos.length) {
 
