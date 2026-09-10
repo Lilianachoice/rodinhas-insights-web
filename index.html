@@ -698,71 +698,40 @@
 
         </p>
 
-        <div class="mainPendentes">
+        <div class="statsBarPendentes">
 
-            <section class="mapa">
-
-                <div id="mapPendentes"></div>
-
-            </section>
-
-            <aside class="insights">
-
-                <h2>Insights</h2>
-
-                <div class="insightCard">
-
-                    <div class="icone">📋</div>
-
-                    <div class="conteudo">
-                        <div class="tituloInsight">Pedidos Pendentes</div>
-                        <div id="insightPendentesTotal" class="valorInsight">--</div>
-                    </div>
-
+            <div class="statPendente">
+                <div class="statIcone">📋</div>
+                <div>
+                    <div class="statValor" id="insightPendentesTotal">--</div>
+                    <div class="statLabel">Pedidos Pendentes</div>
                 </div>
+            </div>
 
-                <div class="insightCard">
-
-                    <div class="icone">📍</div>
-
-                    <div class="conteudo">
-                        <div class="tituloInsight">Localizações</div>
-                        <div id="insightPendentesClusters" class="valorInsight">--</div>
-                    </div>
-
+            <div class="statPendente">
+                <div class="statIcone">📍</div>
+                <div>
+                    <div class="statValor" id="insightPendentesClusters">--</div>
+                    <div class="statLabel">Localizações</div>
                 </div>
+            </div>
 
-                <div class="insightCard" id="insightMelhorPendente" style="cursor:pointer;">
-
-                    <div class="icone">🏆</div>
-
-                    <div class="conteudo">
-                        <div class="tituloInsight">Melhor Oportunidade</div>
-                        <div id="insightMelhorPendenteValor" class="valorInsight">--</div>
-                    </div>
-
+            <div class="statPendente" id="insightMelhorPendente" style="cursor:pointer;">
+                <div class="statIcone">🏆</div>
+                <div>
+                    <div class="statValor" id="insightMelhorPendenteValor" style="font-size:15px;">--</div>
+                    <div class="statLabel">Melhor Oportunidade</div>
                 </div>
-
-                <div class="topOportunidadesBox">
-
-                    <h3>📍 Top Oportunidades</h3>
-
-                    <p class="descIndice">
-                        Clusters de pedidos pendentes, ordenados pelo Índice de Oportunidade.
-                    </p>
-
-                    <div id="listaTopOportunidadesPendentes" class="listaTopOportunidades"></div>
-
-                </div>
-
-            </aside>
+            </div>
 
         </div>
+
+        <div id="listaTopOportunidadesPendentes" class="listaClustersPendentes"></div>
 
         <div id="detalheClusterPendente" class="clusterDetalhe">
 
             <div class="clusterVazio">
-                Seleciona um cluster no mapa, ou na lista de Top Oportunidades, para ver os pedidos.
+                Clica num dos clusters acima para ver os pedidos.
             </div>
 
         </div>
@@ -845,19 +814,6 @@
 
             </div>
 
-            <hr class="separadorCartao">
-
-            <h3>📊 Índice de Oportunidade — Potenciais Rotas</h3>
-
-            <p class="descIndice">
-
-                Pesos próprios desta página, independentes dos usados em Operação
-                Atual e Potencial de Expansão.
-
-            </p>
-
-            <div id="slidersRotas" class="listaSliders"></div>
-
             <button id="guardarConfigRotas" class="botaoGuardar">
                 Guardar
             </button>
@@ -931,6 +887,27 @@
                 </button>
 
                 <span id="confirmacaoExpansao" class="confirmacaoGuardar"></span>
+
+            </div>
+
+            <div class="cartaoIndice">
+
+                <h3>🔓 Viabilidades Pendentes</h3>
+
+                <p class="descIndice">
+
+                    Define o peso de cada critério no Índice de Oportunidade usado na
+                    lista de clusters da página "Potenciais Rotas — Viabilidades Pendentes".
+
+                </p>
+
+                <div id="slidersRotas" class="listaSliders"></div>
+
+                <button id="guardarPesosRotas" class="botaoGuardar">
+                    Guardar
+                </button>
+
+                <span id="confirmacaoPesosRotas" class="confirmacaoGuardar"></span>
 
             </div>
 
