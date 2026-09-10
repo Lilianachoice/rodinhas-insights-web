@@ -47,6 +47,9 @@ async function excluirPedidoTeste(id) {
     if (typeof atualizarPaginaRotas === "function")
         atualizarPaginaRotas();
 
+    if (typeof atualizarPaginaPendentes === "function")
+        atualizarPaginaPendentes();
+
 }
 
 const NOMES_MESES = [
@@ -519,6 +522,9 @@ ligarSlider("valorMinimo", "valorMensal", " €");
             if (typeof atualizarPaginaRotas === "function")
                 atualizarPaginaRotas();
 
+            if (typeof atualizarPaginaPendentes === "function")
+                atualizarPaginaPendentes();
+
         });
 
 });
@@ -550,7 +556,12 @@ const PAGINAS_FILTRO_MES = [
         sufixo: "Rotas",
         setInicio: () => window.filtroMesesInicioRotas,
         setFim: () => window.filtroMesesFimRotas,
-        aoMudar: () => { if (typeof atualizarPaginaRotas === "function") atualizarPaginaRotas(); }
+        aoMudar: () => {
+
+            if (typeof atualizarPaginaRotas === "function") atualizarPaginaRotas();
+            if (typeof atualizarPaginaPendentes === "function") atualizarPaginaPendentes();
+
+        }
     }
 
 ];
@@ -992,6 +1003,15 @@ async function iniciar() {
 
     await carregarPedidos();
 
+    // Não bloqueia o arranque — carrega em paralelo, atualizando a
+    // página assim que os dados chegarem
+    carregarPedidosPendentes().then(() => {
+
+        if (typeof atualizarPaginaPendentes === "function")
+            atualizarPaginaPendentes();
+
+    });
+
     try {
 
         if (typeof atualizarPaginaRotas === "function")
@@ -1046,6 +1066,9 @@ function trocarAba(paginaAtiva, abaAtiva) {
     if (paginaAtiva === "paginaOperacao" && mapa)
         setTimeout(() => mapa.invalidateSize(), 50);
 
+    if (paginaAtiva === "paginaRotas" && mapaPendentes)
+        setTimeout(() => mapaPendentes.invalidateSize(), 50);
+
     if (paginaAtiva === "paginaRotas" && typeof atualizarPaginaRotas === "function") {
 
         try {
@@ -1056,6 +1079,21 @@ function trocarAba(paginaAtiva, abaAtiva) {
         catch (erro) {
 
             console.error("Erro ao atualizar a página de Potenciais Rotas:", erro);
+
+        }
+
+    }
+
+    if (paginaAtiva === "paginaRotas" && typeof atualizarPaginaPendentes === "function") {
+
+        try {
+
+            atualizarPaginaPendentes();
+
+        }
+        catch (erro) {
+
+            console.error("Erro ao atualizar a página de Viabilidades Pendentes:", erro);
 
         }
 
