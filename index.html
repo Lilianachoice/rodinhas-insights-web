@@ -76,7 +76,7 @@
         id="abaRotas"
         class="aba">
 
-        🛣️ Potenciais Rotas
+        🛣️ Potenciais Rotas — Viabilidades Pendentes
 
     </button>
 
@@ -688,20 +688,101 @@
 
     <section class="expansao">
 
-        <h2>🛣️ Potenciais Rotas</h2>
+        <h2>🔓 Viabilidades Pendentes</h2>
 
         <p class="descIndice">
 
-            Os <b>mesmos pedidos não viáveis</b> da Operação Atual — mas aqui organizados
-            como rotas reais, atribuídos ao depósito mais próximo (Porto ou Lisboa) e a
-            respeitar turnos e nº de viaturas disponíveis. Pensado para decidir se vale a
-            pena avançar já com uma rota nova, não só para ver onde há pedidos.
+            Pedidos ainda <b>sem nenhuma decisão de viabilidade</b> — antes de os avaliar
+            um a um, esta vista ajuda a ver se há vários pedidos parecidos (mesma zona,
+            mesma escola) que juntos possam justificar uma rota nova.
+
+        </p>
+
+        <div class="mainPendentes">
+
+            <section class="mapa">
+
+                <div id="mapPendentes"></div>
+
+            </section>
+
+            <aside class="insights">
+
+                <h2>Insights</h2>
+
+                <div class="insightCard">
+
+                    <div class="icone">📋</div>
+
+                    <div class="conteudo">
+                        <div class="tituloInsight">Pedidos Pendentes</div>
+                        <div id="insightPendentesTotal" class="valorInsight">--</div>
+                    </div>
+
+                </div>
+
+                <div class="insightCard">
+
+                    <div class="icone">📍</div>
+
+                    <div class="conteudo">
+                        <div class="tituloInsight">Localizações</div>
+                        <div id="insightPendentesClusters" class="valorInsight">--</div>
+                    </div>
+
+                </div>
+
+                <div class="insightCard" id="insightMelhorPendente" style="cursor:pointer;">
+
+                    <div class="icone">🏆</div>
+
+                    <div class="conteudo">
+                        <div class="tituloInsight">Melhor Oportunidade</div>
+                        <div id="insightMelhorPendenteValor" class="valorInsight">--</div>
+                    </div>
+
+                </div>
+
+                <div class="topOportunidadesBox">
+
+                    <h3>📍 Top Oportunidades</h3>
+
+                    <p class="descIndice">
+                        Clusters de pedidos pendentes, ordenados pelo Índice de Oportunidade.
+                    </p>
+
+                    <div id="listaTopOportunidadesPendentes" class="listaTopOportunidades"></div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+        <div id="detalheClusterPendente" class="clusterDetalhe">
+
+            <div class="clusterVazio">
+                Seleciona um cluster no mapa, ou na lista de Top Oportunidades, para ver os pedidos.
+            </div>
+
+        </div>
+
+        <hr class="separadorCartao" style="margin:32px 0;">
+
+        <h2>📧 Pré-visualização do Email Diário</h2>
+
+        <p class="descIndice">
+
+            Isto abaixo é diferente do que está acima — mostra os pedidos já <b>Não Viáveis</b>
+            organizados por depósito e turno, exatamente como saem no email automático diário.
+            Serve para configurar esse email, não para ver os pedidos ainda por decidir.
 
         </p>
 
         <div class="cartaoIndice">
 
             <h3>🚐 Turnos, Depósitos e Notificações</h3>
+
 
             <p class="descIndice">
 
@@ -922,6 +1003,7 @@
 <script src="ia.js"></script>
 <script src="indices.js"></script>
 <script src="rotas.js"></script>
+<script src="pendentes.js"></script>
 <script src="app.js"></script>
 
 </body>
