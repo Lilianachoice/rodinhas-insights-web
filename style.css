@@ -368,9 +368,22 @@ align-items:start;
     background:transparent !important;
     border:none !important;
     box-shadow:none !important;
-    color:#333;
-    font-weight:700;
-    font-size:11px;
+    color:#3a2e00;
+    font-weight:800;
+    font-size:12px;
+    text-shadow:0 0 3px rgba(255,255,255,.9), 0 0 3px rgba(255,255,255,.9);
+
+}
+
+.numeroSequenciaClaro{
+
+    background:transparent !important;
+    border:none !important;
+    box-shadow:none !important;
+    color:#fff;
+    font-weight:800;
+    font-size:12px;
+    text-shadow:0 0 3px rgba(0,0,0,.8), 0 0 3px rgba(0,0,0,.8);
 
 }
 
