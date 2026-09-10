@@ -1820,3 +1820,39 @@ Nenhuma oportunidade encontrada.
     }
 
 }
+
+/* ========================= */
+/* PENDENTES — layout 2 colunas (mapa + insights) */
+/* ========================= */
+
+.mainPendentes{
+
+    display:grid;
+    grid-template-columns:1fr 320px;
+    gap:25px;
+    align-items:start;
+    margin-bottom:25px;
+
+}
+
+.mainPendentes .mapa{
+
+    min-height:550px;
+
+}
+
+#mapPendentes{
+
+    width:100%;
+    height:100%;
+    min-height:550px;
+
+}
+
+@media (max-width:900px){
+
+    .mainPendentes{
+        grid-template-columns:1fr;
+    }
+
+}
