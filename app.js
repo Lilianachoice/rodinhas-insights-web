@@ -1003,14 +1003,11 @@ async function iniciar() {
 
     await carregarPedidos();
 
-    // Não bloqueia o arranque — carrega em paralelo, atualizando a
-    // página assim que os dados chegarem
-    carregarPedidosPendentes().then(() => {
-
-        if (typeof atualizarPaginaPendentes === "function")
-            atualizarPaginaPendentes();
-
-    });
+    // Os pendentes já NÃO carregam aqui — passaram a carregar só
+    // quando se clica mesmo na aba "Potenciais Rotas" (ver
+    // trocarAba). Isto evita 4 pedidos simultâneos ao Apps Script
+    // logo no arranque, que estavam a fazer com que este em
+    // particular nunca chegasse a responder a tempo.
 
     try {
 
@@ -1081,18 +1078,29 @@ function trocarAba(paginaAtiva, abaAtiva) {
 
     }
 
-    if (paginaAtiva === "paginaRotas" && typeof atualizarPaginaPendentes === "function") {
+    if (paginaAtiva === "paginaRotas" && typeof carregarPedidosPendentes === "function") {
 
-        try {
+        // Só vai buscar os dados na PRIMEIRA vez que se entra nesta
+        // aba (não a cada clique) — depois disso, o timer de 5 em 5
+        // min do pendentes.js mantém os dados atualizados sozinho
+        const jaCarregado = window.pedidosPendentesData && window.pedidosPendentesData.length;
 
-            atualizarPaginaPendentes();
+        const promessa = jaCarregado
+            ? Promise.resolve()
+            : carregarPedidosPendentes();
 
-        }
-        catch (erro) {
+        promessa
+            .then(() => {
 
-            console.error("Erro ao atualizar a página de Viabilidades Pendentes:", erro);
+                if (typeof atualizarPaginaPendentes === "function")
+                    atualizarPaginaPendentes();
 
-        }
+            })
+            .catch(erro => {
+
+                console.error("Erro ao carregar Viabilidades Pendentes:", erro);
+
+            });
 
     }
 
