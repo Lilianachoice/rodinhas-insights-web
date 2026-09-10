@@ -1066,9 +1066,6 @@ function trocarAba(paginaAtiva, abaAtiva) {
     if (paginaAtiva === "paginaOperacao" && mapa)
         setTimeout(() => mapa.invalidateSize(), 50);
 
-    if (paginaAtiva === "paginaRotas" && mapaPendentes)
-        setTimeout(() => mapaPendentes.invalidateSize(), 50);
-
     if (paginaAtiva === "paginaRotas" && typeof atualizarPaginaRotas === "function") {
 
         try {
