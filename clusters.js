@@ -465,7 +465,7 @@ function obterPedidosFiltrados(listaPedidos) {
 //  capacidade, distância pickup/dropoff e tempo)
 // ==========================================
 
-function criarClusters(listaPedidos) {
+function criarClusters(listaPedidos, pesosPersonalizados) {
 
     const capacidade =
         Number(document.getElementById("capacidade").value) || 7;
@@ -573,7 +573,7 @@ function criarClusters(listaPedidos) {
 
     // Calcula o Índice de Oportunidade de cada cluster
     // depois de todos estarem formados (precisa dos máximos globais)
-    calcularIndicesOperacao(clusters);
+    calcularIndicesOperacao(clusters, pesosPersonalizados);
 
     return clusters;
 
@@ -583,12 +583,12 @@ function criarClusters(listaPedidos) {
 // ÍNDICE DE OPORTUNIDADE — OPERAÇÃO ATUAL
 // ==========================================
 
-function calcularIndicesOperacao(clusters) {
+function calcularIndicesOperacao(clusters, pesosPersonalizados) {
 
     if (!clusters.length)
         return;
 
-    const pesos = obterPesosOperacao();
+    const pesos = pesosPersonalizados || obterPesosOperacao();
 
     const maxReceita = Math.max(...clusters.map(c => c.receita), 1);
     const maxPedidos = Math.max(...clusters.map(c => c.pedidos.length), 1);
@@ -702,16 +702,16 @@ function calcularIndicesOperacao(clusters) {
         cluster.metricas = metricas;
 
         const somaBruta =
-            metricas.receita * pesos.receita +
-            metricas.pedidos * pesos.pedidos +
-            metricas.passageiros * pesos.passageiros +
-            metricas.shared * pesos.shared +
-            metricas.private * pesos.private +
-            metricas.horario * pesos.horario +
-            metricas.dias * pesos.dias +
-            metricas.distancia * pesos.distanciaPickups +
-            metricas.duracao * pesos.duracaoServico +
-            metricas.servicosAtivos * pesos.servicosAtivos;
+            metricas.receita * (pesos.receita || 0) +
+            metricas.pedidos * (pesos.pedidos || 0) +
+            metricas.passageiros * (pesos.passageiros || 0) +
+            metricas.shared * (pesos.shared || 0) +
+            metricas.private * (pesos.private || 0) +
+            metricas.horario * (pesos.horario || 0) +
+            metricas.dias * (pesos.dias || 0) +
+            metricas.distancia * (pesos.distanciaPickups || 0) +
+            metricas.duracao * (pesos.duracaoServico || 0) +
+            metricas.servicosAtivos * (pesos.servicosAtivos || 0);
 
         // Normaliza pela soma dos pesos positivos (o máximo teórico
         // que um cluster "perfeito" atingiria com estes pesos).
