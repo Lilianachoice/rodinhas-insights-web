@@ -1007,31 +1007,11 @@ async function iniciar() {
 
     }
 
-    await carregarPedidos();
-
-    // Os pendentes já NÃO carregam aqui — passaram a carregar só
-    // quando se clica mesmo na aba "Potenciais Rotas" (ver
-    // trocarAba). Isto evita 4 pedidos simultâneos ao Apps Script
-    // logo no arranque, que estavam a fazer com que este em
-    // particular nunca chegasse a responder a tempo.
-
-    try {
-
-        if (typeof atualizarPaginaRotas === "function")
-            atualizarPaginaRotas();
-
-    }
-    catch (erro) {
-
-        console.error("Erro ao construir a página de Potenciais Rotas:", erro);
-
-    }
-
-    // "Potenciais Rotas — Viabilidades Pendentes" é agora a página
-    // principal, por isso os dados carregam já aqui (em vez de só
-    // no clique da aba). Corre DEPOIS dos pedidos normais já
-    // estarem prontos (await acima), para não voltar a juntar
-    // vários pedidos simultâneos ao Apps Script logo no arranque.
+    // "Potenciais Rotas — Viabilidades Pendentes" é a página
+    // principal (a que se vê primeiro ao abrir o site), por isso os
+    // dados dela carregam com prioridade, antes dos da Operação
+    // Atual. Isto é independente dos pedidos normais (vem de um
+    // endpoint próprio), por isso pode mesmo correr primeiro.
     try {
 
         await carregarPedidosPendentes();
@@ -1043,6 +1023,23 @@ async function iniciar() {
     catch (erro) {
 
         console.error("Erro ao carregar Viabilidades Pendentes:", erro);
+
+    }
+
+    // Os pedidos da Operação Atual carregam a seguir — o preview do
+    // email diário (mais abaixo) precisa destes dados já carregados,
+    // por isso tem de vir depois deste await, não antes.
+    await carregarPedidos();
+
+    try {
+
+        if (typeof atualizarPaginaRotas === "function")
+            atualizarPaginaRotas();
+
+    }
+    catch (erro) {
+
+        console.error("Erro ao construir a página de Potenciais Rotas:", erro);
 
     }
 
