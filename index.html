@@ -58,7 +58,7 @@
 
     <button
         id="abaOperacao"
-        class="aba ativa">
+        class="aba">
 
         🚐 Operação Atual
 
@@ -74,7 +74,7 @@
 
     <button
         id="abaRotas"
-        class="aba">
+        class="aba ativa">
 
         🛣️ Potenciais Rotas — Viabilidades Pendentes
 
@@ -135,13 +135,12 @@
 <!-- OPERAÇÃO ATUAL -->
 <!-- ===================================================== -->
 
-<div id="paginaOperacao">
+<div id="paginaOperacao" style="display:none;">
 
 <p class="descIndice" style="margin-bottom:14px;">
 
     Todos os pedidos <b>não viáveis</b> com morada válida — vista geográfica bruta, agrupada
-    por proximidade, sem depósito nem restrição de turno atribuída. Para veres esses mesmos
-    pedidos organizados como rotas reais e prontas a avançar, usa a aba "Potenciais Rotas".
+    por proximidade, sem depósito nem restrição de turno atribuída.
 
 </p>
 
@@ -650,7 +649,7 @@
 <!-- POTENCIAIS ROTAS -->
 <!-- ===================================================== -->
 
-<div id="paginaRotas" style="display:none;">
+<div id="paginaRotas">
 
     <div class="barraFiltrosData">
 
