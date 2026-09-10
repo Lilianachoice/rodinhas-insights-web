@@ -385,7 +385,7 @@ function renderizarMiniMapaClusterPendente(cluster) {
         if (temPickup) {
 
             L.circleMarker([pickupLat, pickupLng], {
-                radius: 9, color: "#B8860B", fillColor: "#F5C518", fillOpacity: 0.95, weight: 1.5
+                radius: 15, color: "#B8860B", fillColor: "#F5C518", fillOpacity: 0.95, weight: 1.5
             })
             .bindTooltip(String(indicePedido), { permanent: true, direction: "center", className: "numeroSequencia" })
             .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Pickup (${horaPickup}) — ${moradaPickup}`)
@@ -398,7 +398,7 @@ function renderizarMiniMapaClusterPendente(cluster) {
         if (temDropoff) {
 
             L.circleMarker([dropoffLat, dropoffLng], {
-                radius: 9, color: "#9C1F1F", fillColor: "#E03131", fillOpacity: 0.95, weight: 1.5
+                radius: 15, color: "#9C1F1F", fillColor: "#E03131", fillOpacity: 0.95, weight: 1.5
             })
             .bindTooltip(String(indicePedido), { permanent: true, direction: "center", className: "numeroSequenciaClaro" })
             .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Dropoff — ${moradaDropoff}`)
