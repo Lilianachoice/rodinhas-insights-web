@@ -978,6 +978,12 @@ async function iniciar() {
 
     iniciarMapa();
 
+    // "Potenciais Rotas" é a página que arranca visível por
+    // omissão — garante que a barra de filtros partilhada (Ano/Mês)
+    // já fica com a visibilidade certa, sem precisar de um clique
+    // numa aba primeiro
+    atualizarVisibilidadeBarraFiltrosData("paginaRotas");
+
     // A configuração partilhada nunca deve impedir o resto do site de
     // arrancar — se falhar ou vier mal formada, cai para valores por
     // omissão (ver indices.js) em vez de travar aqui.
@@ -1018,6 +1024,25 @@ async function iniciar() {
     catch (erro) {
 
         console.error("Erro ao construir a página de Potenciais Rotas:", erro);
+
+    }
+
+    // "Potenciais Rotas — Viabilidades Pendentes" é agora a página
+    // principal, por isso os dados carregam já aqui (em vez de só
+    // no clique da aba). Corre DEPOIS dos pedidos normais já
+    // estarem prontos (await acima), para não voltar a juntar
+    // vários pedidos simultâneos ao Apps Script logo no arranque.
+    try {
+
+        await carregarPedidosPendentes();
+
+        if (typeof atualizarPaginaPendentes === "function")
+            atualizarPaginaPendentes();
+
+    }
+    catch (erro) {
+
+        console.error("Erro ao carregar Viabilidades Pendentes:", erro);
 
     }
 
