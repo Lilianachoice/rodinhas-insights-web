@@ -258,13 +258,19 @@ function formatarHora(hora) {
 // assume-se o significado tradicional (hora de recolha).
 function descreverHorario(pedido) {
 
-    return formatarHora(pedido["Pickup Hora"]);
+    const hora = formatarHora(pedido["Pickup Hora"]);
+    const direcao = pedido["Direction"];
+
+    return direcao ? `${hora} (${direcao})` : hora;
 
 }
 
 function descreverHorarioVolta(pedido) {
 
-    return formatarHora(pedido["Return Pickup Hora"]);
+    const hora = formatarHora(pedido["Return Pickup Hora"]);
+    const direcao = pedido["Return Direction"];
+
+    return direcao ? `${hora} (${direcao})` : hora;
 
 }
 
