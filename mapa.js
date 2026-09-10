@@ -251,6 +251,30 @@ function formatarHora(hora) {
 
 }
 
+// "Direction" muda o que a "Pickup Hora" significa:
+// "to"   (casa -> escola) = hora a que a criança deve estar na escola
+// "from" (escola -> casa) = hora a que a criança é recolhida na escola
+// Sem "Direction" (dados antigos, ainda por preencher via backfill),
+// assume-se o significado tradicional (hora de recolha).
+function descreverHorario(pedido) {
+
+    const hora = formatarHora(pedido["Pickup Hora"]);
+
+    if (hora === "—")
+        return "—";
+
+    const direcao = String(pedido["Direction"] || "").toLowerCase();
+
+    if (direcao === "to")
+        return `${hora} (chegada à escola)`;
+
+    if (direcao === "from")
+        return `${hora} (saída da escola)`;
+
+    return hora;
+
+}
+
 function obterViaturasNecessarias(cluster) {
 
     const capacidadeEl = document.getElementById("capacidade");
@@ -535,7 +559,7 @@ function mostrarDetalheCluster(cluster) {
 
 <td>${tipo}</td>
 
-<td>${formatarHora(pedido["Pickup Hora"])}</td>
+<td>${descreverHorario(pedido)}</td>
 
 <td>${moradaPickup}</td>
 
@@ -659,7 +683,7 @@ function renderizarMiniMapaCluster(cluster) {
         const moradaDropoff = [pedido["Dropoff"], pedido["Dropoff Cidade"]]
             .filter(Boolean).join(", ") || "Dropoff";
 
-        const horaPickup = formatarHora(pedido["Pickup Hora"]);
+        const horaPickup = descreverHorario(pedido);
 
         const temPickup = pickupLat && pickupLng;
         const temDropoff = dropoffLat && dropoffLng;
