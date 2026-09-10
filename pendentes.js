@@ -278,7 +278,7 @@ function mostrarDetalheClusterPendente(cluster) {
         const dias = traduzirDias(obterDiasPedido(pedido)) || "—";
 
         const horaVolta = pedidoTemVolta(pedido)
-            ? formatarHora(pedido["Return Pickup Hora"])
+            ? descreverHorarioVolta(pedido)
             : "—";
 
         const passageiros = formatarPassageiros(pedido);
@@ -312,7 +312,6 @@ function mostrarDetalheClusterPendente(cluster) {
             <span><span class="pontoLegenda" style="background:#F5C518;"></span> Pickup</span>
             <span><span class="pontoLegenda" style="background:#E03131;"></span> Dropoff</span>
             <span><span class="linhaLegenda" style="background:#999;"></span> Pickup → Dropoff (mesma viagem)</span>
-            <span><span class="linhaLegenda" style="background:#3B5BDB;"></span> Sequência sugerida (por hora)</span>
         </span>
     </h4>
     <div id="miniMapaClusterPendente"></div>
@@ -339,14 +338,13 @@ function renderizarMiniMapaClusterPendente(cluster) {
 
     }
 
-    miniMapaClusterPendenteInstancia = L.map("miniMapaClusterPendente", { scrollWheelZoom: false });
+    miniMapaClusterPendenteInstancia = L.map("miniMapaClusterPendente", { scrollWheelZoom: true });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap"
     }).addTo(miniMapaClusterPendenteInstancia);
 
     const pontos = [];
-    const pontosRota = [];
 
     const pedidosOrdenados = [...cluster.pedidos].sort((a, b) => {
 
@@ -363,7 +361,11 @@ function renderizarMiniMapaClusterPendente(cluster) {
 
     let sequencia = 0;
 
+    let indicePedido = 0;
+
     pedidosOrdenados.forEach(pedido => {
+
+        indicePedido++;
 
         const pickupLat = paraNumero(pedido["Pickup Lat"]);
         const pickupLng = paraNumero(pedido["Pickup Lng"]);
@@ -377,35 +379,32 @@ function renderizarMiniMapaClusterPendente(cluster) {
         const temPickup = pickupLat && pickupLng;
         const temDropoff = dropoffLat && dropoffLng;
 
+        // O pickup e o dropoff DO MESMO pedido partilham o mesmo
+        // número (mais fácil de ver quais bolas pertencem à mesma
+        // viagem, lendo em conjunto com a linha cinza que os liga)
         if (temPickup) {
 
-            sequencia++;
-
             L.circleMarker([pickupLat, pickupLng], {
-                radius: 8, color: "#B8860B", fillColor: "#F5C518", fillOpacity: 0.95, weight: 1.5
+                radius: 9, color: "#B8860B", fillColor: "#F5C518", fillOpacity: 0.95, weight: 1.5
             })
-            .bindTooltip(String(sequencia), { permanent: true, direction: "center", className: "numeroSequencia" })
+            .bindTooltip(String(indicePedido), { permanent: true, direction: "center", className: "numeroSequencia" })
             .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Pickup (${horaPickup}) — ${moradaPickup}`)
             .addTo(miniMapaClusterPendenteInstancia);
 
             pontos.push([pickupLat, pickupLng]);
-            pontosRota.push([pickupLat, pickupLng]);
 
         }
 
         if (temDropoff) {
 
-            sequencia++;
-
             L.circleMarker([dropoffLat, dropoffLng], {
-                radius: 8, color: "#9C1F1F", fillColor: "#E03131", fillOpacity: 0.95, weight: 1.5
+                radius: 9, color: "#9C1F1F", fillColor: "#E03131", fillOpacity: 0.95, weight: 1.5
             })
-            .bindTooltip(String(sequencia), { permanent: true, direction: "center", className: "numeroSequencia" })
+            .bindTooltip(String(indicePedido), { permanent: true, direction: "center", className: "numeroSequenciaClaro" })
             .bindPopup(`<b>${pedido["ID"] || ""}</b><br>Dropoff — ${moradaDropoff}`)
             .addTo(miniMapaClusterPendenteInstancia);
 
             pontos.push([dropoffLat, dropoffLng]);
-            pontosRota.push([dropoffLat, dropoffLng]);
 
         }
 
@@ -420,13 +419,6 @@ function renderizarMiniMapaClusterPendente(cluster) {
 
     });
 
-    if (pontosRota.length > 1) {
-
-        L.polyline(pontosRota, { color: "#3B5BDB", weight: 2.5, opacity: 0.55 })
-            .addTo(miniMapaClusterPendenteInstancia);
-
-    }
-
     if (pontos.length) {
 
         miniMapaClusterPendenteInstancia.fitBounds(pontos, { padding: [30, 30] });
@@ -438,5 +430,18 @@ function renderizarMiniMapaClusterPendente(cluster) {
     }
 
 }
+
+// Atualiza os dados sozinho de 5 em 5 minutos, enquanto a página
+// estiver aberta — sem isto, ficavas presa aos dados de quando
+// carregaste a página, mesmo que um pedido já tivesse sido
+// decidido entretanto (deixando de ser "pendente")
+setInterval(async () => {
+
+    await carregarPedidosPendentes();
+
+    if (typeof atualizarPaginaPendentes === "function")
+        atualizarPaginaPendentes();
+
+}, 5 * 60 * 1000);
 
 console.log("Pendentes.js carregado");
