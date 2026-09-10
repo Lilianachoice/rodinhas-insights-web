@@ -258,40 +258,13 @@ function formatarHora(hora) {
 // assume-se o significado tradicional (hora de recolha).
 function descreverHorario(pedido) {
 
-    const hora = formatarHora(pedido["Pickup Hora"]);
-
-    if (hora === "—")
-        return "—";
-
-    return `${hora}${sufixoDirecao(pedido["Direction"])}`;
+    return formatarHora(pedido["Pickup Hora"]);
 
 }
 
-// Mesma lógica, mas para a hora de volta (tarde) — usa o campo
-// "Return Direction" (a direção da 2ª perna da viagem, que pode ser
-// diferente da direção da ida)
 function descreverHorarioVolta(pedido) {
 
-    const hora = formatarHora(pedido["Return Pickup Hora"]);
-
-    if (hora === "—")
-        return "—";
-
-    return `${hora}${sufixoDirecao(pedido["Return Direction"])}`;
-
-}
-
-function sufixoDirecao(valorDirection) {
-
-    const direcao = String(valorDirection || "").toLowerCase();
-
-    if (direcao === "to")
-        return " (chegada à escola)";
-
-    if (direcao === "from")
-        return " (saída da escola)";
-
-    return "";
+    return formatarHora(pedido["Return Pickup Hora"]);
 
 }
 
@@ -715,7 +688,7 @@ function renderizarMiniMapaCluster(cluster) {
         if (temPickup) {
 
             L.circleMarker([pickupLat, pickupLng], {
-                radius: 9,
+                radius: 15,
                 color: "#B8860B",
                 fillColor: "#F5C518",
                 fillOpacity: 0.95,
@@ -732,7 +705,7 @@ function renderizarMiniMapaCluster(cluster) {
         if (temDropoff) {
 
             L.circleMarker([dropoffLat, dropoffLng], {
-                radius: 9,
+                radius: 15,
                 color: "#9C1F1F",
                 fillColor: "#E03131",
                 fillOpacity: 0.95,
