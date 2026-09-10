@@ -1856,3 +1856,92 @@ Nenhuma oportunidade encontrada.
     }
 
 }
+
+/* ========================= */
+/* PENDENTES — versão simplificada (lista, sem mapa grande) */
+/* ========================= */
+
+.statsBarPendentes{
+
+    display:flex;
+    gap:16px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+
+}
+
+.statPendente{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:white;
+    border:1px solid #ECECEC;
+    border-radius:14px;
+    padding:14px 18px;
+    flex:1;
+    min-width:180px;
+
+}
+
+.statIcone{
+    font-size:22px;
+}
+
+.statValor{
+    font-size:20px;
+    font-weight:700;
+}
+
+.statLabel{
+    font-size:12px;
+    color:#888;
+}
+
+.listaClustersPendentes{
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:20px;
+
+}
+
+.clusterPendenteCard{
+
+    background:white;
+    border:1px solid #ECECEC;
+    border-radius:14px;
+    padding:16px 20px;
+    cursor:pointer;
+    transition:.2s;
+
+}
+
+.clusterPendenteCard:hover{
+
+    background:#F7F9FC;
+    border-color:#D8E0F0;
+    transform:translateY(-1px);
+
+}
+
+.clusterPendenteHeader{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+
+}
+
+.clusterPendenteTitulo{
+    font-weight:700;
+    font-size:16px;
+    margin-bottom:4px;
+}
+
+.clusterPendenteStats{
+    font-size:13px;
+    color:#777;
+}
